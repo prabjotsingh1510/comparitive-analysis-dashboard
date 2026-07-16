@@ -1,0 +1,11 @@
+# Source financial workbooks — never commit these.
+# The dashboard is self-contained (all figures are embedded at build time),
+# so the deploy does not need them.
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
