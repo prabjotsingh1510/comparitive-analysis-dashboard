@@ -541,21 +541,6 @@ function renderS2(){
        (${R(rj.sum_rev)} / ${nf.format(rj.sum_units)} units) matches too.</p>
   </div>
 
-  <div class="banner" style="--bc:var(--crit)">
-    <h4><span class="ic">!</span>Apr–Jun does not reconcile — the Summary file's Apr–Jun sheet is stale</h4>
-    <p>Apr–Jun now runs off a corrected source (“Unit Cost Economics - Website - Apr 2026-June 2026.xlsx”), which
-       replaces what was previously here. It carries <b>${nf.format(ra.old_units)}</b> units / <b>${R(ra.old_rev)}</b>
-       revenue across <b>${A.tot.n}</b> products — <b>${nf.format(dU)}</b> more units and <b>${R(dRev)}</b> more revenue
-       than the Summary file's own “April-June Unit Cost Ecomomic” sheet (<b>${nf.format(ra.new_units)}</b> units /
-       ${R(ra.new_rev)}), which has <b>not</b> been regenerated since this correction and should be treated as stale.
-       This is not a small gap to reconcile away — it is the correction. <b>${ra.missing.length}</b> product/listing
-       pairs in the corrected source have no counterpart in the stale sheet (mostly renamed or newly split listings).</p>
-    <div class="tw" style="margin-top:10px"><table>
-      <thead><tr><th>In corrected source, not in stale sheet</th><th>Display name</th><th>Revenue</th><th>Units</th></tr></thead>
-      <tbody>${ra.missing.map(x=>`<tr><td><b>${esc(x.key)}</b></td><td class="muted">${esc(x.disp)}</td>
-        <td class="n">${R(x.rev)}</td><td class="n">${x.units}</td></tr>`).join('')}</tbody></table></div>
-  </div>
-
   <div class="tw"><table>
     <thead><tr><th>Period</th><th>Rev — primary source</th><th>Rev — cross-check sheet</th><th>Units — primary</th>
       <th>Units — cross-check</th><th>Rev — Summary GRAND</th><th>Status</th></tr></thead>
