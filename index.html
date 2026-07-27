@@ -395,15 +395,16 @@ function renderS1(){
     ${kpi('Total EBITDA', J.ebitda, A.ebitda, Rs, P(J.ebitdapct)+' of net rev', P(A.ebitdapct)+' of net rev', true)}
     ${kpi('Units Sold', J.units, A.units, v=>nf.format(Math.round(v)), null, null, true)}
   </div>
-  <p class="note" style="margin-top:12px"><b>Read this against a data correction, not a demand drop:</b> Apr–Jun's revenue
-     and units are ${(A.rev/J.rev-1)*100 >= 0 ? '+' : ''}${((A.rev/J.rev-1)*100).toFixed(1)}% and
-     ${(A.units/J.units-1)*100 >= 0 ? '+' : ''}${((A.units/J.units-1)*100).toFixed(1)}% vs Jan–Mar — lower than the figures
-     shown here before, because a confirmed fake/erroneous bulk order (5 SKUs, 350 units, ₹4.77 L — see Section 2) has been
-     stripped out. That order was never real demand, so this dip is the correction working as intended, not the business
-     shrinking. What <em>is</em> a genuine result, on this now-corrected base: margins improved substantially — CM2
-     ${P(J.cm2pct)} → ${P(A.cm2pct)}, EBITDA ${P(J.ebitdapct)} → ${P(A.ebitdapct)} — and losses shrank in ₹ terms
-     (${Rs(A.cm2-J.cm2)} and ${Rs(A.ebitda-J.ebitda)}) even as revenue fell. See the bridge in Section 4 for the drivers
-     (lower marketing and shipping cost per unit, plus a smaller overhead allocation).</p>
+  <p class="note" style="margin-top:12px">Apr–Jun's revenue and units are down
+     ${Math.abs((A.rev/J.rev-1)*100).toFixed(1)}% and ${Math.abs((A.units/J.units-1)*100).toFixed(1)}% against Jan–Mar, and that decline
+     should be read as a data correction rather than a demand drop, since a confirmed fake or erroneous bulk order —
+     spanning five SKUs, 350 units, and ₹4.77 L in revenue — has been stripped out of the figures shown here (see Section 2).
+     Because that order was never real demand, this dip reflects the correction working as intended, not the business
+     shrinking. What is genuinely encouraging is that, on this now-corrected base, margins improved substantially, with CM2
+     moving from ${P(J.cm2pct)} to ${P(A.cm2pct)} and EBITDA from ${P(J.ebitdapct)} to ${P(A.ebitdapct)}, and losses shrank
+     in rupee terms as well — by ${Rs(Math.abs(A.cm2-J.cm2))} and ${Rs(Math.abs(A.ebitda-J.ebitda))} respectively — even as
+     total revenue fell. The bridge in Section 4 lays out the underlying drivers behind that improvement, including a lower
+     marketing cost per unit, a lower shipping cost per unit, and a smaller overhead allocation.</p>
 
   <h2>Margin trend</h2>
   <p class="note">Both margins improved quarter-on-quarter, on top of an unchanged ~82% gross margin — the gain is below the
