@@ -1931,7 +1931,7 @@ function top10TableC(products){
   return `<div class="tw"><table>
     <thead><tr><th>Product</th><th>Category</th><th>Revenue</th><th>Units</th>
       <th>CM2%</th><th>EBITDA%</th><th>Quadrant</th></tr></thead>
-    <tbody>${top10.map(p=>`<tr><td><b>${esc(p.disp||p.key)}</b></td><td class="muted">${esc(p.cat)}</td>
+    <tbody>${top10.map(p=>`<tr><td><b>${esc(p.key||p.disp)}</b>${p.disp&&p.key?`<br><span class="muted" style="font-size:11px">${esc(p.disp.slice(0,42))}${p.disp.length>42?'…':''}</span>`:''}</td><td class="muted">${esc(p.cat)}</td>
       <td class="n">${R(p.rev_t)}</td><td class="n">${nf.format(p.units)}</td>
       <td class="n">${P(p.cm2pct)}</td><td class="n">${P(p.ebitdapct)}</td>
       <td style="text-align:left"><span class="tag" style="--tc:${QC[p.quad]}">${QN[p.quad]}</span></td></tr>`).join('')}
