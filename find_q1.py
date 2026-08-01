@@ -1,0 +1,5 @@
+f = open('index.html', encoding='utf-8')
+html = f.read()
+f.close()
+idx = html.find('Decision Criteria 1')
+print(html[idx:idx+3000])
