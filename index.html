@@ -225,6 +225,7 @@
     <button role="tab" aria-selected="false" data-chan="firstcry">FirstCry</button>
     <button role="tab" aria-selected="false" data-chan="blinkit">Blinkit</button>
     <button role="tab" aria-selected="false" data-chan="analysis">Channel Analysis</button>
+    <button role="tab" aria-selected="false" data-chan="metrics">Important Metrics</button>
   </div>
 </div></div>
 
@@ -608,6 +609,31 @@
 
 </div><!-- /.wrap -->
 </div><!-- /#chan-analysis -->
+
+<div class="chan-panel" id="chan-metrics" hidden>
+<header class="top">
+  <div class="top-in">
+    <h1>Important Metrics — Cross-Channel Decision Layer</h1>
+    <p class="sub">What should we do? Six views built from the same unit-economics data powering all four channel pages. Apr–Jun 2026. All figures ₹.</p>
+    <div class="chan-subnav" role="tablist">
+      <button role="tab" aria-selected="true"  data-tab="m1">1 · Executive Snapshot</button>
+      <button role="tab" aria-selected="false" data-tab="m2">2 · Channel Focus</button>
+      <button role="tab" aria-selected="false" data-tab="m3">3 · Issues &amp; Levers</button>
+      <button role="tab" aria-selected="false" data-tab="m4">4 · Channel Benchmarks</button>
+      <button role="tab" aria-selected="false" data-tab="m5">5 · Liquidation &amp; Upsell</button>
+      <button role="tab" aria-selected="false" data-tab="m6">6 · Final Decision</button>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <section id="m1"></section>
+  <section id="m2" hidden></section>
+  <section id="m3" hidden></section>
+  <section id="m4" hidden></section>
+  <section id="m5" hidden></section>
+  <section id="m6" hidden></section>
+</div>
+</div><!-- /#chan-metrics -->
 <div class="tip" id="tip"></div>
 
 <script>
@@ -3588,6 +3614,497 @@ setupChannel('chan-blinkit', 'b', {
   b5: ()=>renderChanS5(D_BL, 'b', {stagesFn:blinkitWfStages, funnelMode:'ads-portfolio',
         breakingStages:['Marketing Cost','Other Marketing Cost','Blinkit Margin'], breakingLabel:'Marketing + Blinkit Margin'}),
   b6: ()=>renderChanS6(D_BL, 'b', {qaHtml: buildQaBlinkit(D_BL)}),
+});
+
+/* =======================================================================
+   IMPORTANT METRICS — Cross-Channel Decision Layer
+   All reads are from D / D_AMZ / D_FC / D_BL fields already rendered
+   on their native pages. Zero new math; pure aggregation + cross-join.
+   ======================================================================= */
+
+/* ---- PRODUCT_ALIASES: explicit, auditable, literal map ----
+   Normalise key → canonical key (lowercase).
+   Every alias is a named, commented line — no fuzzy matching.        */
+const PRODUCT_ALIASES = {
+  'playdough': 'playdough',
+  'magic paint dust': 'magic paint dust',
+  'b8': 'b8',
+  'sfp': 'sfp',
+  'fp8': 'fp8',
+  'fp3': 'fp3',
+  'b3': 'b3',
+  'cb': 'cb',
+  'jb': 'jb',
+  'canvas kit': 'canvas kit',
+  'sfp+cb': 'sfp+cb',
+  'sfp+jb': 'sfp+jb',
+  'fp8+cb': 'fp8+cb',
+  'fp3+jb': 'fp3+jb',
+  'fp3+cb': 'fp3+cb',
+  'fp3+b3': 'fp3+b3',
+  'magic paint dust+jb': 'magic paint dust+jb',
+  'dp': 'dp',
+  'dp+b8': 'dp+b8',
+  'glue': 'glue',
+  'ar': 'ar',
+  'apron': 'apron',
+  'stamp kit': 'stamp kit',
+  "mini's unicorn": 'unicorn kit',
+  'unicorn kit': 'unicorn kit',
+  "mini's dino": 'dino kit',
+  'dino kit': 'dino kit',
+  'sensory rice': 'sr',
+  'sr': 'sr',
+  'pop & play': 'bubbles',
+  'bubbles': 'bubbles',
+  "mini's sensory play dough kit": "mini's sensory play dough kit",
+  "mini's dessert party": 'mini dessert party',
+  'mini dessert party': 'mini dessert party',
+  "mini's magic dough lab": 'magic dough',
+  'magic dough': 'magic dough',
+  'preschool': 'preschool kit',
+  'preschool kit': 'preschool kit',
+};
+
+function mNorm(k){ return (k||'').trim().toLowerCase(); }
+function mCanon(k){ var n=mNorm(k); return PRODUCT_ALIASES[n]||n; }
+function mR(v){ return v==null||isNaN(v)?'—':R(v); }
+function mP(v){ return v==null||isNaN(v)?'—':P(v); }
+function mRs(v){ return v==null||isNaN(v)?'—':Rs(v); }
+function quadTag(q){ return q?'<span class="tag" style="--tc:'+QC[q]+'">'+QN[q]+'</span>':'<span class="muted">—</span>'; }
+function actTag(a){
+  var map={scale:'var(--good)',overhead:'var(--warn)',overhead_hold:'var(--warn)',cut:'var(--crit)',delist:'var(--crit)'};
+  var lbl={scale:'Scale',overhead:'Hold/Monitor',overhead_hold:'Hold',cut:'Cut Spend',delist:'Delist'};
+  var c=map[a]||'var(--ink-3)', l=lbl[a]||(a||'—');
+  return '<span class="tag" style="--tc:'+c+'">'+l+'</span>';
+}
+
+/* ---- buildProductIndex(): join all four channel product arrays ---- */
+function buildProductIndex(){
+  var aprProds = D.periods.apr.products;
+  var map = {};
+  function upsert(canon, disp, slot, obj){
+    if(!map[canon]) map[canon]={canon:canon, disp:disp||canon, website:null, amazon:null, firstcry:null, blinkit:null};
+    if(!map[canon][slot]) map[canon][slot]=obj;
+    if(disp && disp.length > (map[canon].disp||'').length) map[canon].disp=disp;
+  }
+  var wAgg={};
+  for(var i=0;i<aprProds.length;i++){
+    var p=aprProds[i], c=mCanon(p.key);
+    if(!wAgg[c]){ wAgg[c]=Object.assign({},p,{_n:1}); }
+    else {
+      wAgg[c].rev=(wAgg[c].rev||0)+(p.rev||0);
+      wAgg[c].units=(wAgg[c].units||0)+(p.units||0);
+      wAgg[c].cm2_t=(wAgg[c].cm2_t||0)+(p.cm2_t||0);
+      wAgg[c].ebitda_t=(wAgg[c].ebitda_t||0)+(p.ebitda_t||0);
+      wAgg[c]._n++;
+    }
+  }
+  var wKeys=Object.keys(wAgg);
+  for(var wi=0;wi<wKeys.length;wi++){
+    var wc=wKeys[wi], wp=wAgg[wc];
+    if(wp._n>1){
+      wp.cm2pct=wp.rev?wp.cm2_t/wp.rev*100:null;
+      wp.ebitdapct=wp.rev?wp.ebitda_t/wp.rev*100:null;
+    }
+    upsert(wc, wp.disp||wp.key, 'website', wp);
+  }
+  for(var ai=0;ai<D_AMZ.products.length;ai++){ var ap=D_AMZ.products[ai]; upsert(mCanon(ap.key), ap.disp||ap.key, 'amazon', ap); }
+  for(var fi=0;fi<D_FC.products.length;fi++){  var fp=D_FC.products[fi];  upsert(mCanon(fp.key), fp.disp||fp.key, 'firstcry', fp); }
+  for(var bi=0;bi<D_BL.products.length;bi++){  var bp=D_BL.products[bi];  upsert(mCanon(bp.key), bp.disp||bp.key, 'blinkit', bp); }
+  var vals=Object.values(map);
+  vals.sort(function(a,b){
+    function rev(x){ return (x.website?x.website.rev||0:0)+(x.amazon?x.amazon.rev_t||0:0)+(x.firstcry?x.firstcry.rev_t||0:0)+(x.blinkit?x.blinkit.rev_t||0:0); }
+    return rev(b)-rev(a);
+  });
+  return vals;
+}
+
+/* ---- channelBenchmarks() ---- */
+function channelBenchmarks(data, products){
+  var ps=products.filter(function(p){ return p.units>0; });
+  if(!ps.length) return {avgRev:0,avgUnits:0,avgCm2u:0,avgCm2pct:0,n:0};
+  var n=ps.length;
+  return {
+    n:n,
+    avgRev:  ps.reduce(function(s,p){ return s+(p.rev_t||p.rev||0); },0)/n,
+    avgUnits:ps.reduce(function(s,p){ return s+(p.units||0); },0)/n,
+    avgCm2u: ps.reduce(function(s,p){ return s+(p.cm2_u||0); },0)/n,
+    avgCm2pct:ps.reduce(function(s,p){ return s+(p.cm2pct||0); },0)/n,
+  };
+}
+
+/* ---- detectIssue(): COGS→Packaging→Shipment→Pricing→Marketing walk ---- */
+function detectIssue(prod, chan){
+  var packaging=null; // slot reserved — no per-product data exists anywhere
+  if(chan==='website'){
+    var ship=prod.ship_u!=null?prod.ship_u:null;
+    var mktg=prod.mktg_u!=null?prod.mktg_u:null;
+    var gm=prod.gm_u!=null?prod.gm_u:null;
+    var primaryIssue='',remarks='',recommendation='';
+    if(gm!=null&&gm<0){ primaryIssue='Negative Gross Margin'; remarks='Sell price is below COGS — must raise price or cut COGS first.'; recommendation='Reprice or delist'; }
+    else if(mktg!=null&&mktg>400){ primaryIssue='Marketing overspend'; remarks='Marketing \u20b9'+(mktg.toFixed(0))+'/unit is the dominant drag.'; recommendation='Cut ad spend'; }
+    else if(ship!=null&&ship>200){ primaryIssue='High shipment cost'; remarks='Shipping \u20b9'+(ship.toFixed(0))+'/unit — consider higher MRP or combo bundling.'; recommendation='Bundle / reprice'; }
+    else if(prod.cm2_u!=null&&prod.cm2_u<0){ primaryIssue='Loss-making (CM2\u2212)'; remarks='Multiple costs compress CM2 below zero.'; recommendation='Fix before scaling'; }
+    else if(prod.quad==='overhead'){ primaryIssue='Overhead drag only'; remarks='CM2 is positive; EBITDA gap is purely overhead allocation.'; recommendation='Grow volume'; }
+    else{ primaryIssue='Profitable'; remarks='CM2 and EBITDA positive.'; recommendation='Scale'; }
+    return {primaryIssue:primaryIssue,packaging:packaging,ship:ship!=null?'\u20b9'+ship.toFixed(0)+'/u':null,marketing:mktg!=null?'\u20b9'+mktg.toFixed(0)+'/u':null,remarks:remarks,recommendation:recommendation};
+  }
+  if(chan==='amazon'){
+    var ship2=prod.ship_u!=null?prod.ship_u:null;
+    var mktg2=prod.mktg_u!=null?prod.mktg_u:null;
+    var gm2=prod.gm_u!=null?prod.gm_u:null;
+    var primaryIssue2='',remarks2='',recommendation2='';
+    if(gm2!=null&&gm2<0){ primaryIssue2='Negative Gross Margin'; remarks2='Sell price is below COGS on Amazon.'; recommendation2='Reprice or delist'; }
+    else if(mktg2!=null&&mktg2>300){ primaryIssue2='Marketing overspend'; remarks2='ACOS/marketing \u20b9'+(mktg2.toFixed(0))+'/unit dominates.'; recommendation2='Cut ad spend / improve ACOS'; }
+    else if(ship2!=null&&ship2>80){ primaryIssue2='High FBA fees'; remarks2='FBA+shipping \u20b9'+(ship2.toFixed(0))+'/unit above peer average.'; recommendation2='Optimise fulfil mix'; }
+    else if(prod.cm2_u!=null&&prod.cm2_u<0){ primaryIssue2='Loss-making (CM2\u2212)'; remarks2='Net CM2 is negative on Amazon.'; recommendation2='Fix before scaling'; }
+    else if(prod.quad==='overhead'){ primaryIssue2='Overhead drag only'; remarks2='CM2 positive; overhead allocation causes EBITDA drag.'; recommendation2='Grow volume'; }
+    else{ primaryIssue2='Profitable'; remarks2='CM2 and EBITDA positive.'; recommendation2='Scale'; }
+    return {primaryIssue:primaryIssue2,packaging:packaging,ship:ship2!=null?'\u20b9'+ship2.toFixed(0)+'/u':null,marketing:mktg2!=null?'\u20b9'+mktg2.toFixed(0)+'/u':null,remarks:remarks2,recommendation:recommendation2};
+  }
+  if(chan==='firstcry'){
+    var gm3=prod.gm_u!=null?prod.gm_u:null;
+    // FC_LIQD_RULE: same rule as rebuild_website_summary.py:155-169 delist bucket
+    var FC_LIQD_RULE=(prod.cm2_u!=null&&prod.cm2_u<=0);
+    var primaryIssue3='',remarks3='',recommendation3='';
+    if(gm3!=null&&gm3<0){ primaryIssue3='Negative Gross Margin'; remarks3='Sell price is below COGS on FirstCry.'; recommendation3='Reprice or delist'; }
+    else if(FC_LIQD_RULE){ primaryIssue3='Loss-making (CM2\u22640)'; remarks3='CM2 non-positive — liquidation lean applies (FC rule: cm2_u\u22640).'; recommendation3='Consider liquidation'; }
+    else if(prod.quad==='overhead'){ primaryIssue3='Overhead drag only'; remarks3='CM2 positive; EBITDA gap is overhead allocation.'; recommendation3='Grow volume'; }
+    else{ primaryIssue3='Profitable'; remarks3='CM2 and EBITDA positive on FirstCry.'; recommendation3='Scale'; }
+    // Shipment and Marketing are bundled into FirstCry Margin — not available separately
+    return {primaryIssue:primaryIssue3,packaging:packaging,ship:'Bundled into FirstCry Margin',marketing:'Bundled into FirstCry Margin',remarks:remarks3,recommendation:recommendation3};
+  }
+  if(chan==='blinkit'){
+    var ship4=prod.ship_u!=null?prod.ship_u:null;
+    var mktgTot=(prod.mktg_u||0)+(prod.othmktg_u||0)+(prod.blmargin_u||0);
+    var gm4=prod.gm_u!=null?prod.gm_u:null;
+    var primaryIssue4='',remarks4='',recommendation4='';
+    if(gm4!=null&&gm4<0){ primaryIssue4='Negative Gross Margin'; remarks4='Sell price is below COGS on Blinkit.'; recommendation4='Reprice or delist'; }
+    else if(mktgTot>300){ primaryIssue4='High platform costs'; remarks4='Combined Blinkit margin + marketing \u20b9'+(mktgTot.toFixed(0))+'/unit is dominant drag.'; recommendation4='Negotiate margin / reduce ads'; }
+    else if(ship4!=null&&ship4>100){ primaryIssue4='High last-mile cost'; remarks4='Shipment \u20b9'+(ship4.toFixed(0))+'/unit above peer average.'; recommendation4='Bundle or reprice'; }
+    else if(prod.cm2_u!=null&&prod.cm2_u<0){ primaryIssue4='Loss-making (CM2\u2212)'; remarks4='Net CM2 is negative on Blinkit.'; recommendation4='Fix before scaling'; }
+    else if(prod.quad==='overhead'){ primaryIssue4='Overhead drag only'; remarks4='CM2 positive; overhead is the drag.'; recommendation4='Grow volume'; }
+    else{ primaryIssue4='Profitable'; remarks4='CM2 and EBITDA positive on Blinkit.'; recommendation4='Scale'; }
+    return {primaryIssue:primaryIssue4,packaging:packaging,ship:ship4!=null?'\u20b9'+ship4.toFixed(0)+'/u':null,marketing:mktgTot?'\u20b9'+mktgTot.toFixed(0)+'/u (all-in)':null,remarks:remarks4,recommendation:recommendation4};
+  }
+  return {primaryIssue:'—',packaging:null,ship:null,marketing:null,remarks:'',recommendation:'—'};
+}
+
+/* ===== m1 · Executive Snapshot ===== */
+function renderMetricsM1(){
+  var el=document.getElementById('m1');
+  var aprW=D.periods.apr;
+  var totW=aprW.tot, totA=D_AMZ.tot, totFC=D_FC.tot, totBL=D_BL.tot;
+  var totalRev=(totW.rev||0)+(totA.rev||0)+(totFC.rev||0)+(totBL.rev||0);
+  var totalCm2=(totW.cm2||0)+(totA.cm2||0)+(totFC.cm2||0)+(totBL.cm2||0);
+  var totalEbitda=(totW.ebitda||0)+(totA.ebitda||0)+(totFC.ebitda||0)+(totBL.ebitda||0);
+  var avgCm2pct=totalRev?totalCm2/totalRev*100:0;
+  var channels=[
+    {name:'Website',  tot:totW,  quad:aprW.quad},
+    {name:'Amazon',   tot:totA,  quad:D_AMZ.quad},
+    {name:'FirstCry', tot:totFC, quad:D_FC.quad},
+    {name:'Blinkit',  tot:totBL, quad:D_BL.quad},
+  ];
+  var channelRows='';
+  for(var ci=0;ci<channels.length;ci++){
+    var ch=channels[ci], t=ch.tot, q=ch.quad||{};
+    var starN=(q.star||{}).n||0, ohN=(q.overhead||{}).n||0, lossN=(q.loss||{}).n||0;
+    channelRows+='<tr><td><b>'+ch.name+'</b></td><td class="n">'+mR(t.rev)+'</td><td class="n">'+nf.format(t.units||0)+'</td>'
+      +'<td class="n" style="color:'+(( t.cm2pct||0)<0?'var(--crit)':'var(--good)')+'">'+mP(t.cm2pct)+'</td>'
+      +'<td class="n" style="color:'+((t.ebitdapct||0)<0?'var(--crit)':'var(--good)')+'">'+mP(t.ebitdapct)+'</td>'
+      +'<td class="n">'+(t.n||0)+'</td>'
+      +'<td style="text-align:left"><span class="tag" style="--tc:var(--good)">'+starN+' stars</span>'
+      +' <span class="tag" style="--tc:var(--warn)">'+ohN+' overhead</span>'
+      +' <span class="tag" style="--tc:var(--crit)">'+lossN+' loss</span></td></tr>';
+  }
+  el.innerHTML='<h2>Portfolio KPIs — Apr\u2013Jun 2026 (all channels combined)</h2>'
+    +'<p class="note">Cross-channel aggregation of the totals already shown on each channel\u2019s own page. Website uses its Apr period data.</p>'
+    +'<div class="kpis">'
+    +'<div class="kpi"><h3>Total Portfolio Revenue</h3><div class="kpi-row"><span class="kpi-lab">All 4 channels</span><span class="kpi-val">'+R(totalRev)+'</span></div></div>'
+    +'<div class="kpi"><h3>Total CM2</h3><div class="kpi-row"><span class="kpi-lab">All channels</span><span class="kpi-val" style="color:'+(totalCm2<0?'var(--crit)':'var(--good)')+'">'+R(totalCm2)+'</span></div>'
+    +'<div class="kpi-row"><span class="kpi-lab">Avg CM2%</span><span class="kpi-val sm">'+P(avgCm2pct)+'</span></div></div>'
+    +'<div class="kpi"><h3>Total EBITDA</h3><div class="kpi-row"><span class="kpi-lab">All channels</span><span class="kpi-val" style="color:'+(totalEbitda<0?'var(--crit)':'var(--good)')+'">'+R(totalEbitda)+'</span></div></div>'
+    +'<div class="kpi"><h3>Channels Active</h3><div class="kpi-row"><span class="kpi-lab">With data</span><span class="kpi-val">4</span></div></div>'
+    +'</div>'
+    +'<h2>Per-Channel Summary</h2>'
+    +'<div class="tw"><table><thead><tr><th>Channel</th><th>Revenue</th><th>Units</th><th>CM2%</th><th>EBITDA%</th><th>SKUs</th><th>Quadrant mix</th></tr></thead><tbody>'+channelRows+'</tbody></table></div>'
+    +'<h2>Quadrant Summary</h2>'
+    +'<div class="two-probs">'
+    +'<div class="prob" style="--pc:var(--good)"><h4>\u2605 Stars (CM2+ &amp; EBITDA+)</h4><p>Website <b>'+((aprW.quad.star||{}).n||0)+'</b> \u00b7 Amazon <b>'+((D_AMZ.quad.star||{}).n||0)+'</b> \u00b7 FirstCry <b>'+((D_FC.quad.star||{}).n||0)+'</b> \u00b7 Blinkit <b>'+((D_BL.quad.star||{}).n||0)+'</b></p></div>'
+    +'<div class="prob" style="--pc:var(--warn)"><h4>\u26a0 Overhead-heavy (CM2+, EBITDA\u2212)</h4><p>Website <b>'+((aprW.quad.overhead||{}).n||0)+'</b> \u00b7 Amazon <b>'+((D_AMZ.quad.overhead||{}).n||0)+'</b> \u00b7 FirstCry <b>'+((D_FC.quad.overhead||{}).n||0)+'</b> \u00b7 Blinkit <b>'+((D_BL.quad.overhead||{}).n||0)+'</b></p></div>'
+    +'<div class="prob" style="--pc:var(--crit)"><h4>\u2717 Loss-making (CM2\u2212)</h4><p>Website <b>'+((aprW.quad.loss||{}).n||0)+'</b> \u00b7 Amazon <b>'+((D_AMZ.quad.loss||{}).n||0)+'</b> \u00b7 FirstCry <b>'+((D_FC.quad.loss||{}).n||0)+'</b> \u00b7 Blinkit <b>'+((D_BL.quad.loss||{}).n||0)+'</b></p></div>'
+    +'<div class="prob" style="--pc:var(--s1)"><h4>Total SKUs tracked</h4><p>Website <b>'+(aprW.tot.n||0)+'</b> \u00b7 Amazon <b>'+(D_AMZ.tot.n||0)+'</b> \u00b7 FirstCry <b>'+(D_FC.tot.n||0)+'</b> \u00b7 Blinkit <b>'+(D_BL.tot.n||0)+'</b></p></div>'
+    +'</div>';
+}
+
+/* ===== m2 · Channel Focus ===== */
+function renderMetricsM2(){
+  var el=document.getElementById('m2');
+  var idx=buildProductIndex();
+  var searchVal='', chanFilter='all', quadFilter='all';
+
+  function chanCount(p){ return ['website','amazon','firstcry','blinkit'].filter(function(c){ return p[c]!=null; }).length; }
+  function bestChan(p){
+    var slots=[{chan:'Website',obj:p.website,cm2:p.website?p.website.cm2_u:null},
+               {chan:'Amazon',obj:p.amazon,cm2:p.amazon?p.amazon.cm2_u:null},
+               {chan:'FirstCry',obj:p.firstcry,cm2:p.firstcry?p.firstcry.cm2_u:null},
+               {chan:'Blinkit',obj:p.blinkit,cm2:p.blinkit?p.blinkit.cm2_u:null}]
+      .filter(function(s){ return s.obj!=null&&s.cm2!=null; });
+    if(!slots.length) return '\u2014';
+    slots.sort(function(a,b){ return b.cm2-a.cm2; });
+    return slots[0].chan+' (CM2/u '+Rs(slots[0].cm2)+')';
+  }
+  function fmtCell(p,c){
+    var pr=p[c];
+    if(!pr) return '<td class="muted" style="text-align:center">\u2014</td>';
+    var cm2=pr.cm2_u, cm2pct=pr.cm2pct;
+    return '<td class="n"><span style="color:'+(cm2!=null&&cm2<0?'var(--crit)':'var(--good)')+'">'+
+      (cm2!=null?Rs(cm2):'\u2014')+'</span><br><span class="muted" style="font-size:10px">'+
+      (cm2pct!=null?P(cm2pct):'\u2014')+'</span></td>';
+  }
+
+  function render(){
+    var q=searchVal.toLowerCase();
+    var rows=idx.filter(function(p){
+      if(q&&!p.canon.includes(q)&&!(p.disp||'').toLowerCase().includes(q)) return false;
+      if(chanFilter!=='all'&&!p[chanFilter]) return false;
+      if(quadFilter!=='all'){
+        if(!['website','amazon','firstcry','blinkit'].some(function(c){ return p[c]&&p[c].quad===quadFilter; })) return false;
+      }
+      return true;
+    });
+    var cc=chanCount;
+    var tbody=rows.map(function(p){
+      var n=cc(p);
+      return '<tr><td><b>'+esc(p.canon)+'</b>'+(p.disp&&p.disp!==p.canon?'<br><span class="muted" style="font-size:10px">'+esc((p.disp||'').slice(0,50))+((p.disp||'').length>50?'\u2026':'')+'</span>':'')+'</td>'
+        +'<td style="text-align:center"><span class="tag" style="--tc:'+(n>=3?'var(--good)':n>=2?'var(--warn)':'var(--ink-3)')+'">'+n+'</span></td>'
+        +'<td style="text-align:left;font-size:12px">'+bestChan(p)+'</td>'
+        +fmtCell(p,'website')+fmtCell(p,'amazon')+fmtCell(p,'firstcry')+fmtCell(p,'blinkit')+'</tr>';
+    }).join('');
+    document.getElementById('m2-tbody').innerHTML=tbody;
+    document.getElementById('m2-count').textContent=rows.length+' products';
+  }
+
+  el.innerHTML='<h2>Product \u00d7 Channel Matrix</h2>'
+    +'<p class="note">CM2/unit and CM2% per channel. Products matched via normalised key + PRODUCT_ALIASES table. Single-channel products are included and flagged.</p>'
+    +'<div class="ctrls">'
+    +'<input type="search" id="m2-search" placeholder="Search product\u2026" style="min-width:200px">'
+    +'<select id="m2-chanf"><option value="all">All channels</option><option value="website">Website</option><option value="amazon">Amazon</option><option value="firstcry">FirstCry</option><option value="blinkit">Blinkit</option></select>'
+    +'<select id="m2-quadf"><option value="all">All quadrants</option><option value="star">Star</option><option value="overhead">Overhead</option><option value="loss">Loss</option></select>'
+    +'<span id="m2-count" class="muted" style="font-size:12px"></span></div>'
+    +'<div class="tw"><table><thead><tr><th>Product (canonical key)</th><th>Channels</th><th>Best channel by CM2/u</th><th>Website CM2/u</th><th>Amazon CM2/u</th><th>FirstCry CM2/u</th><th>Blinkit CM2/u</th></tr></thead><tbody id="m2-tbody"></tbody></table></div>';
+  render();
+  document.getElementById('m2-search').addEventListener('input',function(e){ searchVal=e.target.value; render(); });
+  document.getElementById('m2-chanf').addEventListener('change',function(e){ chanFilter=e.target.value; render(); });
+  document.getElementById('m2-quadf').addEventListener('change',function(e){ quadFilter=e.target.value; render(); });
+}
+
+/* ===== m3 · Issues & Levers ===== */
+function renderMetricsM3(){
+  var el=document.getElementById('m3');
+  var idx=buildProductIndex();
+  var searchVal='', chanFilter='all';
+  var allRows=[];
+  for(var pi=0;pi<idx.length;pi++){
+    var p=idx[pi];
+    var chans=[{chan:'website',label:'Website',obj:p.website},{chan:'amazon',label:'Amazon',obj:p.amazon},{chan:'firstcry',label:'FirstCry',obj:p.firstcry},{chan:'blinkit',label:'Blinkit',obj:p.blinkit}];
+    for(var ci2=0;ci2<chans.length;ci2++){
+      var ch2=chans[ci2];
+      if(!ch2.obj) continue;
+      var iss=detectIssue(ch2.obj,ch2.chan);
+      allRows.push({product:p.canon,disp:p.disp,channel:ch2.label,chanKey:ch2.chan,obj:ch2.obj,iss:iss});
+    }
+  }
+
+  function render(){
+    var q=searchVal.toLowerCase();
+    var rows=allRows.filter(function(r){
+      if(q&&!r.product.includes(q)&&!(r.disp||'').toLowerCase().includes(q)) return false;
+      if(chanFilter!=='all'&&r.chanKey!==chanFilter) return false;
+      return true;
+    });
+    var tbody=rows.map(function(r){
+      return '<tr><td><b>'+esc(r.product)+'</b></td><td>'+r.channel+'</td>'
+        +'<td style="text-align:left">'+quadTag(r.obj.quad||null)+'</td><td class="n" style="color:'+(r.obj.cm2_u!=null&&r.obj.cm2_u<0?'var(--crit)':'var(--good)')+'">'+mRs(r.obj.cm2_u)+'</td>'
+        +'<td style="font-size:12px;color:var(--crit);font-weight:600">'+esc(r.iss.primaryIssue)+'</td>'
+        +'<td class="muted" style="font-size:11px">'+esc(r.iss.ship||'\u2014')+'</td>'
+        +'<td class="muted" style="font-size:11px">'+esc(r.iss.marketing||'\u2014')+'</td>'
+        +'<td style="font-size:11px;max-width:200px;white-space:normal">'+esc(r.iss.remarks)+'</td></tr>';
+    }).join('');
+    document.getElementById('m3-tbody').innerHTML=tbody;
+    document.getElementById('m3-count').textContent=rows.length+' rows';
+  }
+
+  el.innerHTML='<h2>Issue Identification &amp; Lever Analysis</h2>'
+    +'<div class="banner" style="--bc:var(--warn)"><h4><span class="ic">!</span>Packaging data</h4>'
+    +'<p>No per-product packaging figure exists in any channel dataset. The Packaging column shows \u201cNot available at product level\u201d for every row. This slot is reserved; wire real data here when available.</p></div>'
+    +'<div class="ctrls"><input type="search" id="m3-search" placeholder="Search product\u2026" style="min-width:200px">'
+    +'<select id="m3-chanf"><option value="all">All channels</option><option value="website">Website</option><option value="amazon">Amazon</option><option value="firstcry">FirstCry</option><option value="blinkit">Blinkit</option></select>'
+    +'<span id="m3-count" class="muted" style="font-size:12px"></span></div>'
+    +'<div class="tw"><table><thead><tr><th>Product</th><th>Channel</th><th>Quadrant</th><th>CM2/u</th><th>Primary Issue</th><th>Shipment</th><th>Marketing</th><th>Remarks</th></tr></thead><tbody id="m3-tbody"></tbody></table></div>';
+  render();
+  document.getElementById('m3-search').addEventListener('input',function(e){ searchVal=e.target.value; render(); });
+  document.getElementById('m3-chanf').addEventListener('change',function(e){ chanFilter=e.target.value; render(); });
+}
+
+/* ===== m4 · Channel Benchmarks ===== */
+function renderMetricsM4(){
+  var el=document.getElementById('m4');
+  var aprW=D.periods.apr;
+  var bW=channelBenchmarks(D,aprW.products);
+  var bA=channelBenchmarks(D_AMZ,D_AMZ.products);
+  var bFC=channelBenchmarks(D_FC,D_FC.products);
+  var bBL=channelBenchmarks(D_BL,D_BL.products);
+
+  function benchRow(name,b,tot){
+    return '<tr><td><b>'+name+'</b></td><td class="n">'+mR(tot.rev)+'</td><td class="n">'+nf.format(tot.units||0)+'</td>'
+      +'<td class="n" style="color:'+((tot.cm2pct||0)<0?'var(--crit)':'var(--good)')+'">'+mP(tot.cm2pct)+'</td>'
+      +'<td class="n" style="color:'+((tot.ebitdapct||0)<0?'var(--crit)':'var(--good)')+'">'+mP(tot.ebitdapct)+'</td>'
+      +'<td class="n">'+mR(b.avgRev)+'</td><td class="n">'+mR(b.avgCm2u)+'</td><td class="n">'+mP(b.avgCm2pct)+'</td><td class="n">'+b.n+'</td></tr>';
+  }
+  function catRows(cats,chanName){
+    return (cats||[]).map(function(c){
+      return '<tr><td>'+chanName+'</td><td><b>'+esc(c.cat)+'</b></td><td class="n">'+mR(c.rev)+'</td><td class="n">'+nf.format(c.units||0)+'</td>'
+        +'<td class="n" style="color:'+((c.cm2pct||0)<0?'var(--crit)':'var(--good)')+'">'+mP(c.cm2pct)+'</td>'
+        +'<td class="n" style="color:'+((c.ebitdapct||0)<0?'var(--crit)':'var(--good)')+'">'+mP(c.ebitdapct)+'</td>'
+        +'<td class="n">'+c.n+'</td></tr>';
+    }).join('');
+  }
+  el.innerHTML='<h2>Channel-Level Benchmarks</h2>'
+    +'<p class="note">Channel averages computed from product arrays. Category rollups from each channel\u2019s cats[] array.</p>'
+    +'<div class="tw"><table><thead><tr><th>Channel</th><th>Total Rev</th><th>Units</th><th>CM2%</th><th>EBITDA%</th><th>Avg Rev/SKU</th><th>Avg CM2/u</th><th>Avg CM2%/SKU</th><th>SKUs</th></tr></thead><tbody>'
+    +benchRow('Website (Apr)',bW,aprW.tot)
+    +benchRow('Amazon',bA,D_AMZ.tot)
+    +benchRow('FirstCry',bFC,D_FC.tot)
+    +benchRow('Blinkit',bBL,D_BL.tot)
+    +'</tbody></table></div>'
+    +'<h2>Category Benchmarks by Channel</h2>'
+    +'<div class="tw"><table><thead><tr><th>Channel</th><th>Category</th><th>Revenue</th><th>Units</th><th>CM2%</th><th>EBITDA%</th><th>SKUs</th></tr></thead><tbody>'
+    +catRows(aprW.cats,'Website')+catRows(D_AMZ.cats,'Amazon')+catRows(D_FC.cats,'FirstCry')+catRows(D_BL.cats,'Blinkit')
+    +'</tbody></table></div>';
+}
+
+/* ===== m5 · Liquidation & Upsell ===== */
+function renderMetricsM5(){
+  var el=document.getElementById('m5');
+  var aprW=D.periods.apr;
+  var liq=[], upsell=[];
+
+  function collectChan(products, chanName, hasAct){
+    for(var i=0;i<products.length;i++){
+      var p=products[i];
+      var isLiq=hasAct?(p.act==='cut'||p.act==='delist'):(p.cm2_u!=null&&p.cm2_u<=0);
+      if(isLiq){ var row=Object.assign({},p,{_chan:chanName,_hasAct:hasAct}); liq.push(row); }
+      else if(p.quad==='overhead'&&p.cm2_u!=null&&p.cm2_u>0){
+        upsell.push(Object.assign({},p,{_chan:chanName,_gap:p.oh_u||0}));
+      }
+    }
+  }
+  collectChan(aprW.products,'Website',true);
+  collectChan(D_AMZ.products,'Amazon',true);
+  collectChan(D_FC.products,'FirstCry',false);
+  collectChan(D_BL.products,'Blinkit',true);
+  liq.sort(function(a,b){ return (a.cm2_t||a.cm2_u||0)-(b.cm2_t||b.cm2_u||0); });
+  upsell.sort(function(a,b){ return a._gap-b._gap; });
+
+  var liqRows=liq.map(function(p){
+    return '<tr><td><b>'+esc(p.key||p.disp||'')+'</b></td><td>'+p._chan+'</td>'
+      +'<td class="n" style="color:var(--crit)">'+mRs(p.cm2_u)+'</td>'
+      +'<td class="n">'+(p.units!=null?nf.format(p.units):'\u2014')+'</td>'
+      +'<td style="text-align:left">'+(p._hasAct?actTag(p.act):'<span class="tag" style="--tc:var(--crit)">Liquidate (CM2\u22640)</span>')+'</td>'
+      +'<td style="font-size:11px;max-width:180px;white-space:normal">'+(p._hasAct?'Pipeline recommendation':'FC rule: cm2_u\u22640')+'</td></tr>';
+  }).join('');
+  var upsellRows=upsell.slice(0,20).map(function(p){
+    return '<tr><td><b>'+esc(p.key||p.disp||'')+'</b></td><td>'+p._chan+'</td>'
+      +'<td class="n" style="color:var(--good)">'+mRs(p.cm2_u)+'</td>'
+      +'<td class="n" style="color:var(--warn)">'+mRs(p.ebitda_u)+'</td>'
+      +'<td class="n">'+'\u20b9'+Math.round(p._gap)+'/u OH gap</td>'
+      +'<td style="text-align:left">'+quadTag(p.quad)+'</td></tr>';
+  }).join('');
+
+  el.innerHTML='<h2>Liquidation Candidates</h2>'
+    +'<p class="note">Website, Amazon, Blinkit: products flagged <em>cut</em> or <em>delist</em> by the existing pipeline action field. FirstCry (no action field): CM2/unit \u2264 0 rule applied \u2014 same rule as rebuild_website_summary.py:155\u2013169 delist bucket, applied to FirstCry for the first time here.</p>'
+    +(liq.length?'<div class="tw"><table><thead><tr><th>Product</th><th>Channel</th><th>CM2/u</th><th>Units</th><th>Action</th><th>Reason</th></tr></thead><tbody>'+liqRows+'</tbody></table></div>'
+      :'<p class="muted">No liquidation candidates identified.</p>')
+    +'<h2 style="margin-top:28px">Upsell / Near-Breakeven Opportunities</h2>'
+    +'<p class="note">Overhead-quadrant products (CM2+, EBITDA\u2212) sorted by smallest overhead gap. Volume growth or a price increase equal to the gap per unit would flip to EBITDA+.</p>'
+    +(upsell.length?'<div class="tw"><table><thead><tr><th>Product</th><th>Channel</th><th>CM2/u</th><th>EBITDA/u</th><th>Overhead gap</th><th>Quadrant</th></tr></thead><tbody>'+upsellRows+'</tbody></table></div>'
+      :'<p class="muted">No overhead-only products found.</p>');
+}
+
+/* ===== m6 · Final Decision Table ===== */
+function renderMetricsM6(){
+  var el=document.getElementById('m6');
+  var idx=buildProductIndex();
+  var searchVal='', chanFilter='all', actionFilter='all';
+
+  function getAct(p, chan){
+    var obj=p[chan];
+    if(!obj) return null;
+    if(chan==='firstcry'){
+      // FC has no act field — derive: cm2_u<=0 → cut; star quad → scale; otherwise → overhead
+      return (obj.cm2_u!=null&&obj.cm2_u<=0)?'cut':(obj.quad==='star'?'scale':'overhead');
+    }
+    return obj.act||obj.quad||null;
+  }
+  var actPriority={cut:0,delist:0,loss:1,overhead_hold:2,overhead:2,scale:3,star:4};
+
+  function render(){
+    var q=searchVal.toLowerCase();
+    var rows=idx.filter(function(p){
+      if(q&&!p.canon.includes(q)&&!(p.disp||'').toLowerCase().includes(q)) return false;
+      if(chanFilter!=='all'&&!p[chanFilter]) return false;
+      if(actionFilter!=='all'){
+        var chans=['website','amazon','firstcry','blinkit'];
+        if(!chans.some(function(c){ return getAct(p,c)===actionFilter; })) return false;
+      }
+      return true;
+    });
+    var tbody=rows.map(function(p){
+      var acts=['website','amazon','firstcry','blinkit'].map(function(c){ return getAct(p,c); });
+      var dominated=acts.filter(function(a){ return a!=null; }).reduce(function(best,a){
+        return (actPriority[a]!=null?actPriority[a]:2)<(actPriority[best]!=null?actPriority[best]:2)?a:best;
+      },'scale');
+      return '<tr><td><b>'+esc(p.canon)+'</b>'+(p.disp&&p.disp!==p.canon?'<br><span class="muted" style="font-size:10px">'+esc((p.disp||'').slice(0,48))+'</span>':'')+'</td>'
+        +'<td style="text-align:left">'+(acts[0]?actTag(acts[0]):'<span class="muted">\u2014</span>')+'</td>'
+        +'<td style="text-align:left">'+(acts[1]?actTag(acts[1]):'<span class="muted">\u2014</span>')+'</td>'
+        +'<td style="text-align:left">'+(acts[2]?actTag(acts[2])+'<span class="muted" style="font-size:10px;display:block">rule-derived</span>':'<span class="muted">\u2014</span>')+'</td>'
+        +'<td style="text-align:left">'+(acts[3]?actTag(acts[3]):'<span class="muted">\u2014</span>')+'</td>'
+        +'<td style="font-weight:700;text-align:left">'+actTag(dominated)+'</td></tr>';
+    }).join('');
+    document.getElementById('m6-tbody').innerHTML=tbody;
+    document.getElementById('m6-count').textContent=rows.length+' products';
+  }
+
+  el.innerHTML='<h2>Final Decision Table</h2>'
+    +'<p class="note">Action per channel, plus overall portfolio recommendation (most conservative action wins). FirstCry actions are rule-derived since the channel has no pipeline action field.</p>'
+    +'<div class="ctrls">'
+    +'<input type="search" id="m6-search" placeholder="Search product\u2026" style="min-width:200px">'
+    +'<select id="m6-chanf"><option value="all">All channels</option><option value="website">Website</option><option value="amazon">Amazon</option><option value="firstcry">FirstCry</option><option value="blinkit">Blinkit</option></select>'
+    +'<select id="m6-actf"><option value="all">All actions</option><option value="scale">Scale</option><option value="overhead">Overhead/Hold</option><option value="cut">Cut</option><option value="delist">Delist</option></select>'
+    +'<span id="m6-count" class="muted" style="font-size:12px"></span></div>'
+    +'<div class="tw"><table><thead><tr><th>Product</th><th>Website</th><th>Amazon</th><th>FirstCry (rule-derived)</th><th>Blinkit</th><th>Overall</th></tr></thead><tbody id="m6-tbody"></tbody></table></div>'
+    +'<div class="tk" style="--tkc:var(--s1);margin-top:20px"><h3>Decision Rule \u2014 How actions are assigned</h3>'
+    +'<p><b>Scale:</b> CM2+ and EBITDA+ (star quadrant). Every incremental unit generates real profit \u2014 invest here.</p>'
+    +'<p><b>Hold/Monitor:</b> CM2+ but EBITDA\u2212 (overhead-heavy). Direct costs are covered; overhead allocation is the drag. Hold spend and grow volume to dilute overheads.</p>'
+    +'<p><b>Cut:</b> CM2\u2212 (loss-making). The product loses money before overhead. Cut paid spend immediately. Fix pricing or COGS before any further investment.</p>'
+    +'<p><b>FirstCry note:</b> FirstCry has no pipeline action field. Actions are rule-derived: CM2/unit \u2264 0 \u2192 Cut; CM2+ &amp; EBITDA+ \u2192 Scale; CM2+ &amp; EBITDA\u2212 \u2192 Hold. Same classification rule as rebuild_website_summary.py:155\u2013169 delist bucket.</p>'
+    +'<p><b>Overall column:</b> Most conservative action across all channels \u2014 ensures no product is \u201cscaled\u201d globally while losing money on any active channel.</p></div>';
+  render();
+  document.getElementById('m6-search').addEventListener('input',function(e){ searchVal=e.target.value; render(); });
+  document.getElementById('m6-chanf').addEventListener('change',function(e){ chanFilter=e.target.value; render(); });
+  document.getElementById('m6-actf').addEventListener('change',function(e){ actionFilter=e.target.value; render(); });
+}
+
+/* ---- wire up the new tab exactly like the existing three ---- */
+setupChannel('chan-metrics','m',{
+  m1:renderMetricsM1,
+  m2:renderMetricsM2,
+  m3:renderMetricsM3,
+  m4:renderMetricsM4,
+  m5:renderMetricsM5,
+  m6:renderMetricsM6,
 });
 
 </script>
