@@ -1,0 +1,5 @@
+chan-analysis" hidden>
+<header class="top">
+  <div class="top-in">
+    <h1>Channel Decision Analysis — Apr–Jun 2026</h1>
+    <p class="sub">Six strategic questions answered channel-by-channel using ve

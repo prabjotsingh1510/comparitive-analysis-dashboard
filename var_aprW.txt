@@ -1,0 +1,5 @@
+aprW=D.periods.apr;
+  var totW=aprW.tot, totA=D_AMZ.tot, totFC=D_FC.tot, totBL=D_BL.tot;
+  var totalRev=(totW.rev||0)+(totA.rev||0)+(totFC.rev||0)+(totBL.rev||0);
+  var totalCm2=(totW.cm2||0)+(totA.cm2||0)+(totFC.cm2||0)+(totBL.cm2||0);
+  var totalEbitda=(totW.ebitda||0)+(totA.ebitda||0)+(totFC.ebit

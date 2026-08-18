@@ -1,0 +1,14 @@
+TDA+ &amp; CM2+</h3>
+  <div class="ans">
+    <p>A product is only genuinely profitable when <b>both CM2 and EBITDA are positive</b> — meaning it earns above its direct costs <em>and</em> its overhead share.</p>
+    <div class="tw" style="margin-top:10px"><table>
+      <thead><tr><th>Channel</th><th>Profitable SKUs</th><th>Rev from stars</th><th>% of channel rev</th><th>Combined EBITDA</th><th>Top SKUs (CM2/unit → EBITDA/unit)</th></tr></thead>
+      <tbody>
+        <tr><td><b>Website</b></td><td>8 of 81</td><td>₹2.56 L</td><td>10.6%</td><td><span class="up">+₹10,283</span></td>
+          <td style="text-align:left;padding:8px 10px">
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              <div style="display:inline-flex;flex-direction:column;background:var(--wash);border:1px solid var(--good);border-left:3px solid var(--good);border-radius:6px;padding:4px 8px;min-width:90px">
+                <span style="font-size:11.5px;font-weight:700;color:var(--ink-1);white-space:nowrap">SJ+SFP+CB</span>
+                <span style="font-size:10px;color:var(--ink-3);margin-top:1px;font-variant-numeric:tabular-nums">CM2 ₹325 → EBITDA ₹96</span>
+              </div>
+              <div style="display:inline-flex;flex-direction:column;background:var(--wash);border:1px solid var

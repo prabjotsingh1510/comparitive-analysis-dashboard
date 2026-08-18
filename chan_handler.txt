@@ -1,0 +1,11 @@
+(!b) return;
+  document.querySelectorAll('.chan-switch button').forEach(x=>x.setAttribute('aria-selected', x===b));
+  document.querySelectorAll('.chan-panel').forEach(p=>p.hidden = p.id !== 'chan-'+b.dataset.chan);
+});
+
+function setupChannel(panelId, pfx, renderers){
+  const panel=document.getElementById(panelId);
+  const done={};
+  function show(id){
+    panel.querySelectorAll('.chan-subnav button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===id));
+    panel.querySelectorAll('.wr

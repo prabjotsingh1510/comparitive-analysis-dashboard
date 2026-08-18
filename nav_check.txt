@@ -1,0 +1,9 @@
+chan-switch { display: flex; gap: 2px; }
+  .chan-switch button { background: none; border: 1px solid var(--border); border-radius: 7px;
+    padding: 7px 16px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+  .chan-switch button:hover { color: var(--ink-1); background: var(--wash); }
+  .chan-switch button[aria-selected="true"] { background: var(--s1); color: #fff; border-color: var(--s1); }
+  .chan-panel[hidden] { display: none; }
+
+  /* per-channel sub-nav for Amazon/FirstCry/Blinkit — same visual as Website's `nav`/`nav button`,
+     duplicated under 

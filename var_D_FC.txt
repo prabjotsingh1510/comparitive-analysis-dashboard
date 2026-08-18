@@ -1,0 +1,1 @@
+D_FC = {"channel": "FirstCry", "periodLabel": "Apr–Jun 2026", "tot": {"rev": 893573, "netrev": 720787, "units": 1126, "gm": 588182, "fcm": 338747.54, "cm2": 249339, "oh": 257854, "ebitda": -8515, "cm2pct": 34.592605027560154, "ebitdapct": -1.181347610320386, "gmpct": 81.6027481072772, "n": 39}, "qua
