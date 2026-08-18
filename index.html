@@ -1596,7 +1596,7 @@ function renderS1(){
     <tbody>${top10.map(p=>{
       const a=amap[p.k];
       const flip=a && a.quad!==p.quad;
-      const mv = !a ? '<span class="muted">not sold Apr–Jun</span>'
+      const mv = !a ? '—'
         : flip ? `<span class="tag" style="--tc:${QC[p.quad]}">${QN[p.quad]}</span>
                   <span class="muted"> → </span>
                   <span class="tag" style="--tc:${QC[a.quad]}">${QN[a.quad]}</span>`
