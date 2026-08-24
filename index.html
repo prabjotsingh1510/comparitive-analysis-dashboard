@@ -1068,7 +1068,7 @@
       // missing values (— in the table) are treated as 0
       var data = [
         // [GrossMargin, Marketing, PlatformFee, Shipping]
-        [79.1, 90.5,  0.0, 17.0],  // Website
+        [79.1, 74.5,  0.0, 17.0],  // Website
         [77.7, 28.7,  0.0, 17.1],  // Amazon
         [67.5,  0.0, 39.0,  0.0],  // FirstCry
         [77.6, 45.8, 42.6, 11.4],  // Blinkit
@@ -1192,10 +1192,10 @@
     </script>
 
     <div class="tw" style="margin-top:4px"><table>
-      <thead><tr><th>Channel</th><th>Gross margin %</th><th>Marketing as % of net rev</th><th>Platform fee % of net rev</th><th>Shipping % of net rev</th><th>Primary lever</th></tr></thead>
+      <thead><tr><th>Channel</th><th>Gross margin %</th><th>Marketing as % of rev (with GST)</th><th>Platform fee % of net rev</th><th>Shipping % of net rev</th><th>Primary lever</th></tr></thead>
       <tbody>
-        <tr><td><b>Website</b></td><td class="n">79.1%</td><td class="n"><b style="color:var(--crit)">90.5%</b></td><td class="n">&mdash;</td><td class="n">~17.0%</td>
-          <td><b>Marketing efficiency.</b> GM is healthy at 79.1%. Total marketing spend (₹18.04 L) is 90.5% of net revenue — many loss-making SKUs have marketing costs exceeding their revenue per unit. CAC/conversion fix is the #1 lever.</td></tr>
+        <tr><td><b>Website</b></td><td class="n">79.1%</td><td class="n"><b style="color:var(--warn)">74.5%</b></td><td class="n">&mdash;</td><td class="n">~17.0%</td>
+          <td><b>Marketing efficiency.</b> GM is healthy at 79.1%. Total marketing spend (₹18.04 L) is 74.5% of 3-month revenue (with GST) — within the 90% threshold. However, many individual SKUs still have marketing costs exceeding their revenue per unit. CAC/conversion fix is the #1 lever.</td></tr>
         <tr><td><b>Amazon</b></td><td class="n">77.7%</td><td class="n"><b style="color:var(--crit)">28.7%</b></td><td class="n">&mdash;</td><td class="n">~17.1%*</td>
           <td><b>Marketing + referral fee.</b> Amazon Ads are 28.7% of net rev. Fix: cut ad spend on low converters (see Section 5).</td></tr>
         <tr><td><b>FirstCry</b></td><td class="n">67.5%</td><td class="n">&mdash;</td><td class="n"><b style="color:var(--crit)">39.0%</b></td><td class="n">&mdash;</td>
@@ -1309,18 +1309,18 @@
 <header class="top">
   <div class="top-in">
     <h1>Website Marketing Spend Analysis — Apr–Jun 2026</h1>
-    <p class="sub">Marketing spend as % of 3-month revenue — with GST (Col E) vs without GST (Col AD). All figures ₹.</p>
+    <p class="sub">Marketing spend as % of 3-month revenue with GST (Col E) — the correct denominator. All figures ₹.</p>
   </div>
 </header>
 <div class="wrap" style="padding-top:26px">
 
 <h2>Summary — Total Website Marketing Spend</h2>
-<p class="note">Comparing marketing spend efficiency against gross revenue (with GST) vs net revenue (without GST). The GST component inflates the denominator when measuring against col E, making the ratio appear lower. Using col AD (without GST) gives a cleaner picture of true marketing efficiency.</p>
+<p class="note">Marketing spend measured against 3-month gross revenue with GST (Col E = ₹24.20 L). GST is collected on behalf of the government and flows through the revenue line — the with-GST revenue is the correct denominator because that is what the business actually invoices and must fund marketing from.</p>
 
 <!-- Two-bar comparison chart replacing the four stat cards -->
 <div class="chart" style="margin-bottom:20px;padding:22px 24px 18px;max-width:680px">
-  <div style="font-size:13.5px;font-weight:700;color:var(--ink-1);margin-bottom:4px">Marketing Spend as % of Revenue</div>
-  <div style="font-size:11.5px;color:var(--ink-3);margin-bottom:20px">Same spend (₹18.04 L) — different denominator. GST inflates revenue, masking the true ratio.</div>
+  <div style="font-size:13.5px;font-weight:700;color:var(--ink-1);margin-bottom:4px">Marketing Spend as % of 3-Month Revenue (with GST)</div>
+  <div style="font-size:11.5px;color:var(--ink-3);margin-bottom:20px">₹18.04 L spend ÷ ₹24.20 L revenue (Col E, incl. GST) = 74.5%. Revenue with GST is the correct denominator.</div>
 
   <!-- SVG bar chart -->
   <div id="mktg-bar-wrap" style="position:relative">
@@ -1331,11 +1331,11 @@
       <rect x="110" y="12" width="380" height="46" rx="5" fill="var(--grid,#f0efe8)" opacity="0.7"/>
       <rect x="110" y="86" width="380" height="46" rx="5" fill="var(--grid,#f0efe8)" opacity="0.7"/>
 
-      <!-- Bar 1: 74.5% of 380px = 283.1px -->
-      <rect id="bar-with-gst" x="110" y="12" width="283" height="46" rx="5" fill="#f59e0b"/>
+      <!-- Bar 1 (primary): 74.5% of 380px = 283.1px — with GST (correct denominator) -->
+      <rect id="bar-with-gst" x="110" y="12" width="283" height="46" rx="5" fill="#2a78d6"/>
 
-      <!-- Bar 2: 90.5% of 380px = 343.9px -->
-      <rect id="bar-without-gst" x="110" y="86" width="344" height="46" rx="5" fill="#e34948"/>
+      <!-- Bar 2 (reference only): 90.5% of 380px = 343.9px — without GST (shown for reference) -->
+      <rect id="bar-without-gst" x="110" y="86" width="344" height="46" rx="5" fill="#898781" opacity="0.6"/>
 
       <!-- 100% reference line -->
       <line x1="490" y1="6" x2="490" y2="142" stroke="var(--ink-3,#898781)" stroke-width="1"
@@ -1344,38 +1344,26 @@
 
       <!-- Bar 1 label: value inside bar -->
       <text x="246" y="40" text-anchor="middle" dominant-baseline="middle"
-            font-size="16" font-weight="700" fill="white" font-family="system-ui,sans-serif">74.5%</text>
+            font-size="16" font-weight="700" fill="white" font-family="system-ui,sans-serif">74.5% ✓</text>
 
       <!-- Bar 2 label: value inside bar -->
       <text x="282" y="114" text-anchor="middle" dominant-baseline="middle"
-            font-size="16" font-weight="700" fill="white" font-family="system-ui,sans-serif">90.5%</text>
+            font-size="13" font-weight="600" fill="white" font-family="system-ui,sans-serif">90.5% (excl. GST)</text>
 
       <!-- Bar axis labels (left) -->
       <text x="104" y="35" text-anchor="end" dominant-baseline="middle"
-            font-size="11" fill="var(--ink-2,#52514e)" font-family="system-ui,sans-serif">With GST</text>
+            font-size="11" font-weight="700" fill="#2a78d6" font-family="system-ui,sans-serif">With GST ✓</text>
       <text x="104" y="50" text-anchor="end" dominant-baseline="middle"
-            font-size="9.5" fill="var(--ink-3,#898781)" font-family="system-ui,sans-serif">(Col E)</text>
+            font-size="9.5" fill="var(--ink-3,#898781)" font-family="system-ui,sans-serif">(Col E — primary)</text>
       <text x="104" y="109" text-anchor="end" dominant-baseline="middle"
-            font-size="11" fill="var(--ink-2,#52514e)" font-family="system-ui,sans-serif">Without GST</text>
+            font-size="11" fill="var(--ink-3,#898781)" font-family="system-ui,sans-serif">Without GST</text>
       <text x="104" y="124" text-anchor="end" dominant-baseline="middle"
-            font-size="9.5" fill="var(--ink-3,#898781)" font-family="system-ui,sans-serif">(Col AD)</text>
+            font-size="9.5" fill="var(--ink-3,#898781)" font-family="system-ui,sans-serif">(Col AD — ref only)</text>
 
-      <!-- Bracket / annotation showing +16.0pp difference -->
-      <!-- Vertical bracket lines -->
-      <line x1="397" y1="58" x2="397" y2="86" stroke="#6366f1" stroke-width="1.5"/>
-      <line x1="454" y1="58" x2="454" y2="86" stroke="#6366f1" stroke-width="1.5"/>
-      <!-- Top horizontal cap -->
-      <line x1="397" y1="58" x2="454" y2="58" stroke="#6366f1" stroke-width="1.5"/>
-      <!-- Bracket tick marks -->
-      <line x1="397" y1="58" x2="397" y2="54" stroke="#6366f1" stroke-width="1.5"/>
-      <line x1="454" y1="58" x2="454" y2="54" stroke="#6366f1" stroke-width="1.5"/>
-      <!-- Center tick down to label -->
-      <line x1="425" y1="58" x2="425" y2="68" stroke="#6366f1" stroke-width="1.5"/>
-
-      <!-- Annotation label -->
-      <rect x="386" y="68" width="78" height="18" rx="4" fill="#6366f1"/>
-      <text x="425" y="77" text-anchor="middle" dominant-baseline="middle"
-            font-size="10.5" font-weight="700" fill="white" font-family="system-ui,sans-serif">+16.0 pp</text>
+      <!-- Annotation: Col AD is reference only -->
+      <rect x="370" y="68" width="140" height="18" rx="4" fill="rgba(137,135,129,0.35)"/>
+      <text x="440" y="77" text-anchor="middle" dominant-baseline="middle"
+            font-size="10" font-weight="600" fill="var(--ink-2,#52514e)" font-family="system-ui,sans-serif">+16.0 pp gap (reference)</text>
 
       <!-- x-axis tick labels -->
       <text x="110" y="152" text-anchor="middle" font-size="9" fill="var(--ink-3,#898781)" font-family="system-ui,sans-serif">0%</text>
@@ -1406,12 +1394,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td>3-month Revenue <b>with GST</b> (Col E)</td><td class="n">₹24,20,328</td><td class="muted">Gross revenue incl. 18% GST</td></tr>
-          <tr><td>3-month Revenue <b>without GST</b> (Col AD)</td><td class="n">₹19,93,065</td><td class="muted">Net revenue — true denominator</td></tr>
+          <tr style="font-weight:600;background:var(--wash)"><td>3-month Revenue <b>with GST</b> (Col E) ✓</td><td class="n">₹24,20,328</td><td class="muted">Gross invoiced revenue — correct denominator</td></tr>
+          <tr><td>3-month Revenue <b>without GST</b> (Col AD)</td><td class="n">₹19,93,065</td><td class="muted">Excl. GST — shown for reference only</td></tr>
           <tr><td>Total Marketing Spend</td><td class="n">₹18,03,521</td><td class="muted">Shopify ads, Meta, Google etc.</td></tr>
-          <tr><td>GST difference (inflated denominator)</td><td class="n" style="color:var(--warn)">+₹4,27,263</td><td class="muted">Why ratio looks 16 pp better w/ GST</td></tr>
-          <tr style="font-weight:600"><td>Mktg % of Rev <b>with GST</b></td><td class="n" style="color:var(--warn)">74.5%</td><td class="muted">÷ Col E</td></tr>
-          <tr style="font-weight:600"><td>Mktg % of Rev <b>without GST</b></td><td class="n" style="color:var(--crit)">90.5%</td><td class="muted">÷ Col AD — true figure</td></tr>
+          <tr><td>GST component</td><td class="n" style="color:var(--ink-3)">₹4,27,263</td><td class="muted">GST collected — flows through revenue line</td></tr>
+          <tr style="font-weight:700"><td>Mktg % of Rev <b>with GST</b> ✓</td><td class="n" style="color:var(--good)">74.5%</td><td class="muted">÷ Col E — primary figure (below 90% threshold)</td></tr>
+          <tr style="color:var(--ink-3)"><td>Mktg % of Rev <b>without GST</b> (ref only)</td><td class="n">90.5%</td><td class="muted">÷ Col AD — reference only, not primary metric</td></tr>
         </tbody>
       </table>
     </div>
@@ -1435,23 +1423,23 @@
   </script>
 </div>
 
-<div class="banner" style="--bc:var(--warn)">
-  <h4><span class="ic">!</span>Key Insight</h4>
-  <p>When measured against <b>revenue with GST (Col E)</b>, marketing spend appears at <b>74.5%</b> of revenue. But GST is a pass-through tax — it doesn’t represent real business revenue. Measuring against <b>revenue without GST (Col AD)</b> shows the true ratio at <b>90.5%</b> — a difference of <b>+16.0 percentage points</b>. All unit economics decisions should use the without-GST figure as the true denominator.</p>
+<div class="banner" style="--bc:var(--good)">
+  <h4><span class="ic">✓</span>Key Insight</h4>
+  <p>Marketing spend is <b>74.5% of 3-month revenue with GST (Col E)</b> — within the <b>90% threshold</b>. Revenue with GST is the correct denominator because that is what is invoiced to customers and what the business funds its operations from. The without-GST figure (90.5%) is shown for reference only and is <em>not</em> used as the primary marketing efficiency metric.</p>
 </div>
 
 <h2>Per-Product Breakdown</h2>
-<p class="note">Products sorted by 3-month revenue with GST (Col E) descending. Top 25 products shown.</p>
+<p class="note">Products sorted by 3-month revenue with GST (Col E) descending. <b>Mktg % (Col E)</b> is the primary metric — marketing spend as % of revenue with GST. Col AD shown for reference only.</p>
 <div class="tw"><table>
   <thead>
     <tr>
       <th>Product</th>
       <th>Units</th>
-      <th>Rev w/ GST (Col E)</th>
+      <th>Rev w/ GST (Col E) ✓</th>
       <th>Rev w/o GST (Col AD)</th>
       <th>Marketing Spend</th>
-      <th>Mktg % (Col E)</th>
-      <th>Mktg % (Col AD)</th>
+      <th style="background:var(--wash,#f8f7f0);font-weight:700">Mktg % (Col E) ✓</th>
+      <th style="color:var(--ink-3)">Mktg % (Col AD)</th>
       <th>CM2/unit</th>
     </tr>
   </thead>
@@ -1462,8 +1450,8 @@
   <td class="n">₹228,058</td>
   <td class="n">₹187,913</td>
   <td class="n">₹232,929</td>
-  <td class="n">102.1%</td>
-  <td class="n"><span class="down" style="font-weight:600">124.0%</span></td>
+  <td class="n" style="font-weight:700">102.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">124.0%</span></td>
   <td class="n"><span class="down">₹-333/u</span></td>
 </tr><tr>
   <td style="text-align:left">Playdough</td>
@@ -1471,8 +1459,8 @@
   <td class="n">₹224,974</td>
   <td class="n">₹186,124</td>
   <td class="n">₹213,049</td>
-  <td class="n">94.7%</td>
-  <td class="n"><span class="down" style="font-weight:600">114.5%</span></td>
+  <td class="n" style="font-weight:700">94.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">114.5%</span></td>
   <td class="n"><span class="down">₹-393/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP8+CB</td>
@@ -1480,8 +1468,8 @@
   <td class="n">₹172,949</td>
   <td class="n">₹142,367</td>
   <td class="n">₹71,333</td>
-  <td class="n">41.2%</td>
-  <td class="n"><span class="" style="font-weight:600">50.1%</span></td>
+  <td class="n" style="font-weight:700">41.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">50.1%</span></td>
   <td class="n"><span class="up">₹72/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP</td>
@@ -1489,8 +1477,8 @@
   <td class="n">₹127,623</td>
   <td class="n">₹104,956</td>
   <td class="n">₹80,769</td>
-  <td class="n">63.3%</td>
-  <td class="n"><span class="" style="font-weight:600">77.0%</span></td>
+  <td class="n" style="font-weight:700">63.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">77.0%</span></td>
   <td class="n"><span class="down">₹-161/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP+CB</td>
@@ -1498,8 +1486,8 @@
   <td class="n">₹106,738</td>
   <td class="n">₹88,077</td>
   <td class="n">₹42,824</td>
-  <td class="n">40.1%</td>
-  <td class="n"><span class="" style="font-weight:600">48.6%</span></td>
+  <td class="n" style="font-weight:700">40.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">48.6%</span></td>
   <td class="n"><span class="up">₹49/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP+JB</td>
@@ -1507,8 +1495,8 @@
   <td class="n">₹98,611</td>
   <td class="n">₹81,535</td>
   <td class="n">₹35,588</td>
-  <td class="n">36.1%</td>
-  <td class="n"><span class="" style="font-weight:600">43.6%</span></td>
+  <td class="n" style="font-weight:700">36.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">43.6%</span></td>
   <td class="n"><span class="up">₹224/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP8+AR+CB</td>
@@ -1516,8 +1504,8 @@
   <td class="n">₹95,282</td>
   <td class="n">₹78,375</td>
   <td class="n">₹31,203</td>
-  <td class="n">32.7%</td>
-  <td class="n"><span class="" style="font-weight:600">39.8%</span></td>
+  <td class="n" style="font-weight:700">32.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">39.8%</span></td>
   <td class="n"><span class="up">₹270/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP8, B8, CB</td>
@@ -1525,8 +1513,8 @@
   <td class="n">₹89,346</td>
   <td class="n">₹73,337</td>
   <td class="n">₹34,846</td>
-  <td class="n">39.0%</td>
-  <td class="n"><span class="" style="font-weight:600">47.5%</span></td>
+  <td class="n" style="font-weight:700">39.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">47.5%</span></td>
   <td class="n"><span class="up">₹182/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3</td>
@@ -1534,8 +1522,8 @@
   <td class="n">₹81,603</td>
   <td class="n">₹66,798</td>
   <td class="n">₹50,886</td>
-  <td class="n">62.4%</td>
-  <td class="n"><span class="" style="font-weight:600">76.2%</span></td>
+  <td class="n" style="font-weight:700">62.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">76.2%</span></td>
   <td class="n"><span class="down">₹-94/u</span></td>
 </tr><tr>
   <td style="text-align:left">B3</td>
@@ -1543,8 +1531,8 @@
   <td class="n">₹74,752</td>
   <td class="n">₹61,630</td>
   <td class="n">₹100,749</td>
-  <td class="n">134.8%</td>
-  <td class="n"><span class="down" style="font-weight:600">163.5%</span></td>
+  <td class="n" style="font-weight:700">134.8%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">163.5%</span></td>
   <td class="n"><span class="down">₹-469/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP8</td>
@@ -1552,8 +1540,8 @@
   <td class="n">₹61,630</td>
   <td class="n">₹51,127</td>
   <td class="n">₹25,567</td>
-  <td class="n">41.5%</td>
-  <td class="n"><span class="" style="font-weight:600">50.0%</span></td>
+  <td class="n" style="font-weight:700">41.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">50.0%</span></td>
   <td class="n"><span class="up">₹21/u</span></td>
 </tr><tr>
   <td style="text-align:left">AR</td>
@@ -1561,8 +1549,8 @@
   <td class="n">₹59,084</td>
   <td class="n">₹48,540</td>
   <td class="n">₹23,942</td>
-  <td class="n">40.5%</td>
-  <td class="n"><span class="" style="font-weight:600">49.3%</span></td>
+  <td class="n" style="font-weight:700">40.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">49.3%</span></td>
   <td class="n"><span class="down">₹-13/u</span></td>
 </tr><tr>
   <td style="text-align:left">magic paint dust+jb</td>
@@ -1570,8 +1558,8 @@
   <td class="n">₹52,670</td>
   <td class="n">₹43,430</td>
   <td class="n">₹30,838</td>
-  <td class="n">58.5%</td>
-  <td class="n"><span class="" style="font-weight:600">71.0%</span></td>
+  <td class="n" style="font-weight:700">58.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">71.0%</span></td>
   <td class="n"><span class="down">₹-57/u</span></td>
 </tr><tr>
   <td style="text-align:left">Apron</td>
@@ -1579,8 +1567,8 @@
   <td class="n">₹48,589</td>
   <td class="n">₹39,713</td>
   <td class="n">₹16,922</td>
-  <td class="n">34.8%</td>
-  <td class="n"><span class="" style="font-weight:600">42.6%</span></td>
+  <td class="n" style="font-weight:700">34.8%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">42.6%</span></td>
   <td class="n"><span class="down">₹-27/u</span></td>
 </tr><tr>
   <td style="text-align:left">MPD+AR</td>
@@ -1588,8 +1576,8 @@
   <td class="n">₹46,749</td>
   <td class="n">₹38,482</td>
   <td class="n">₹24,842</td>
-  <td class="n">53.1%</td>
-  <td class="n"><span class="" style="font-weight:600">64.6%</span></td>
+  <td class="n" style="font-weight:700">53.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">64.6%</span></td>
   <td class="n"><span class="down">₹-62/u</span></td>
 </tr><tr>
   <td style="text-align:left">ABC Kit</td>
@@ -1597,8 +1585,8 @@
   <td class="n">₹46,506</td>
   <td class="n">₹37,323</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹193/u</span></td>
 </tr><tr>
   <td style="text-align:left">Canvas Kit</td>
@@ -1606,8 +1594,8 @@
   <td class="n">₹45,846</td>
   <td class="n">₹44,250</td>
   <td class="n">₹64,402</td>
-  <td class="n">140.5%</td>
-  <td class="n"><span class="down" style="font-weight:600">145.5%</span></td>
+  <td class="n" style="font-weight:700">140.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">145.5%</span></td>
   <td class="n"><span class="down">₹-607/u</span></td>
 </tr><tr>
   <td style="text-align:left">Stamp kit</td>
@@ -1615,8 +1603,8 @@
   <td class="n">₹42,022</td>
   <td class="n">₹34,702</td>
   <td class="n">₹12,806</td>
-  <td class="n">30.5%</td>
-  <td class="n"><span class="" style="font-weight:600">36.9%</span></td>
+  <td class="n" style="font-weight:700">30.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">36.9%</span></td>
   <td class="n"><span class="up">₹49/u</span></td>
 </tr><tr>
   <td style="text-align:left">T&F</td>
@@ -1624,8 +1612,8 @@
   <td class="n">₹37,339</td>
   <td class="n">₹30,865</td>
   <td class="n">₹18,587</td>
-  <td class="n">49.8%</td>
-  <td class="n"><span class="" style="font-weight:600">60.2%</span></td>
+  <td class="n" style="font-weight:700">49.8%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">60.2%</span></td>
   <td class="n"><span class="down">₹-64/u</span></td>
 </tr><tr>
   <td style="text-align:left">Preschool kit</td>
@@ -1633,8 +1621,8 @@
   <td class="n">₹36,114</td>
   <td class="n">₹29,441</td>
   <td class="n">₹27,771</td>
-  <td class="n">76.9%</td>
-  <td class="n"><span class="down" style="font-weight:600">94.3%</span></td>
+  <td class="n" style="font-weight:700">76.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">94.3%</span></td>
   <td class="n"><span class="down">₹-287/u</span></td>
 </tr><tr>
   <td style="text-align:left">SJ+B8</td>
@@ -1642,8 +1630,8 @@
   <td class="n">₹34,809</td>
   <td class="n">₹28,603</td>
   <td class="n">₹29,490</td>
-  <td class="n">84.7%</td>
-  <td class="n"><span class="down" style="font-weight:600">103.1%</span></td>
+  <td class="n" style="font-weight:700">84.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">103.1%</span></td>
   <td class="n"><span class="down">₹-187/u</span></td>
 </tr><tr>
   <td style="text-align:left">SJ+SFP+CB</td>
@@ -1651,8 +1639,8 @@
   <td class="n">₹32,541</td>
   <td class="n">₹26,716</td>
   <td class="n">₹12,362</td>
-  <td class="n">38.0%</td>
-  <td class="n"><span class="" style="font-weight:600">46.3%</span></td>
+  <td class="n" style="font-weight:700">38.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">46.3%</span></td>
   <td class="n"><span class="up">₹320/u</span></td>
 </tr><tr>
   <td style="text-align:left">DP</td>
@@ -1660,8 +1648,8 @@
   <td class="n">₹31,190</td>
   <td class="n">₹24,902</td>
   <td class="n">₹23,615</td>
-  <td class="n">75.7%</td>
-  <td class="n"><span class="down" style="font-weight:600">94.8%</span></td>
+  <td class="n" style="font-weight:700">75.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">94.8%</span></td>
   <td class="n"><span class="down">₹-132/u</span></td>
 </tr><tr>
   <td style="text-align:left">DP</td>
@@ -1669,8 +1657,8 @@
   <td class="n">₹31,190</td>
   <td class="n">₹24,902</td>
   <td class="n">₹23,615</td>
-  <td class="n">75.7%</td>
-  <td class="n"><span class="down" style="font-weight:600">94.8%</span></td>
+  <td class="n" style="font-weight:700">75.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">94.8%</span></td>
   <td class="n"><span class="down">₹-132/u</span></td>
 </tr><tr>
   <td style="text-align:left">SR+Playdough</td>
@@ -1678,8 +1666,8 @@
   <td class="n">₹28,525</td>
   <td class="n">₹23,515</td>
   <td class="n">₹12,521</td>
-  <td class="n">43.9%</td>
-  <td class="n"><span class="" style="font-weight:600">53.2%</span></td>
+  <td class="n" style="font-weight:700">43.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">53.2%</span></td>
   <td class="n"><span class="up">₹85/u</span></td>
 </tr><tr>
   <td style="text-align:left">B8</td>
@@ -1687,8 +1675,8 @@
   <td class="n">₹27,680</td>
   <td class="n">₹22,714</td>
   <td class="n">₹22,412</td>
-  <td class="n">81.0%</td>
-  <td class="n"><span class="down" style="font-weight:600">98.7%</span></td>
+  <td class="n" style="font-weight:700">81.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">98.7%</span></td>
   <td class="n"><span class="down">₹-193/u</span></td>
 </tr><tr>
   <td style="text-align:left">Bubbles</td>
@@ -1696,8 +1684,8 @@
   <td class="n">₹22,558</td>
   <td class="n">₹18,119</td>
   <td class="n">₹36,618</td>
-  <td class="n">162.3%</td>
-  <td class="n"><span class="down" style="font-weight:600">202.1%</span></td>
+  <td class="n" style="font-weight:700">162.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">202.1%</span></td>
   <td class="n"><span class="down">₹-471/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP+Apron</td>
@@ -1705,8 +1693,8 @@
   <td class="n">₹21,892</td>
   <td class="n">₹17,932</td>
   <td class="n">₹5,941</td>
-  <td class="n">27.1%</td>
-  <td class="n"><span class="" style="font-weight:600">33.1%</span></td>
+  <td class="n" style="font-weight:700">27.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">33.1%</span></td>
   <td class="n"><span class="up">₹212/u</span></td>
 </tr><tr>
   <td style="text-align:left">Mini SPD</td>
@@ -1714,8 +1702,8 @@
   <td class="n">₹20,401</td>
   <td class="n">₹16,378</td>
   <td class="n">₹31,598</td>
-  <td class="n">154.9%</td>
-  <td class="n"><span class="down" style="font-weight:600">192.9%</span></td>
+  <td class="n" style="font-weight:700">154.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">192.9%</span></td>
   <td class="n"><span class="down">₹-599/u</span></td>
 </tr><tr>
   <td style="text-align:left">SR</td>
@@ -1723,8 +1711,8 @@
   <td class="n">₹19,996</td>
   <td class="n">₹16,482</td>
   <td class="n">₹30,440</td>
-  <td class="n">152.2%</td>
-  <td class="n"><span class="down" style="font-weight:600">184.7%</span></td>
+  <td class="n" style="font-weight:700">152.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">184.7%</span></td>
   <td class="n"><span class="down">₹-708/u</span></td>
 </tr><tr>
   <td style="text-align:left">Playdough+MPD</td>
@@ -1732,8 +1720,8 @@
   <td class="n">₹19,729</td>
   <td class="n">₹16,076</td>
   <td class="n">₹10,526</td>
-  <td class="n">53.4%</td>
-  <td class="n"><span class="" style="font-weight:600">65.5%</span></td>
+  <td class="n" style="font-weight:700">53.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">65.5%</span></td>
   <td class="n"><span class="up">₹7/u</span></td>
 </tr><tr>
   <td style="text-align:left">Playdough+AR</td>
@@ -1741,8 +1729,8 @@
   <td class="n">₹19,127</td>
   <td class="n">₹15,772</td>
   <td class="n">₹14,797</td>
-  <td class="n">77.4%</td>
-  <td class="n"><span class="down" style="font-weight:600">93.8%</span></td>
+  <td class="n" style="font-weight:700">77.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">93.8%</span></td>
   <td class="n"><span class="down">₹-358/u</span></td>
 </tr><tr>
   <td style="text-align:left">B3+AR</td>
@@ -1750,8 +1738,8 @@
   <td class="n">₹18,847</td>
   <td class="n">₹15,693</td>
   <td class="n">₹18,897</td>
-  <td class="n">100.3%</td>
-  <td class="n"><span class="down" style="font-weight:600">120.4%</span></td>
+  <td class="n" style="font-weight:700">100.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">120.4%</span></td>
   <td class="n"><span class="down">₹-721/u</span></td>
 </tr><tr>
   <td style="text-align:left">B3+AR</td>
@@ -1759,8 +1747,8 @@
   <td class="n">₹18,847</td>
   <td class="n">₹15,693</td>
   <td class="n">₹18,897</td>
-  <td class="n">100.3%</td>
-  <td class="n"><span class="down" style="font-weight:600">120.4%</span></td>
+  <td class="n" style="font-weight:700">100.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">120.4%</span></td>
   <td class="n"><span class="down">₹-721/u</span></td>
 </tr><tr>
   <td style="text-align:left">JB</td>
@@ -1768,8 +1756,8 @@
   <td class="n">₹17,313</td>
   <td class="n">₹13,998</td>
   <td class="n">₹21,718</td>
-  <td class="n">125.4%</td>
-  <td class="n"><span class="down" style="font-weight:600">155.2%</span></td>
+  <td class="n" style="font-weight:700">125.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">155.2%</span></td>
   <td class="n"><span class="down">₹-399/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+JB</td>
@@ -1777,8 +1765,8 @@
   <td class="n">₹15,641</td>
   <td class="n">₹12,913</td>
   <td class="n">₹9,842</td>
-  <td class="n">62.9%</td>
-  <td class="n"><span class="" style="font-weight:600">76.2%</span></td>
+  <td class="n" style="font-weight:700">62.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">76.2%</span></td>
   <td class="n"><span class="down">₹-71/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+JB</td>
@@ -1786,8 +1774,8 @@
   <td class="n">₹15,641</td>
   <td class="n">₹12,913</td>
   <td class="n">₹9,842</td>
-  <td class="n">62.9%</td>
-  <td class="n"><span class="" style="font-weight:600">76.2%</span></td>
+  <td class="n" style="font-weight:700">62.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">76.2%</span></td>
   <td class="n"><span class="down">₹-71/u</span></td>
 </tr><tr>
   <td style="text-align:left">B3+Playdough</td>
@@ -1795,8 +1783,8 @@
   <td class="n">₹15,299</td>
   <td class="n">₹12,340</td>
   <td class="n">₹9,900</td>
-  <td class="n">64.7%</td>
-  <td class="n"><span class="" style="font-weight:600">80.2%</span></td>
+  <td class="n" style="font-weight:700">64.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">80.2%</span></td>
   <td class="n"><span class="down">₹-221/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+B3+AR</td>
@@ -1804,8 +1792,8 @@
   <td class="n">₹15,247</td>
   <td class="n">₹12,581</td>
   <td class="n">₹5,775</td>
-  <td class="n">37.9%</td>
-  <td class="n"><span class="" style="font-weight:600">45.9%</span></td>
+  <td class="n" style="font-weight:700">37.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">45.9%</span></td>
   <td class="n"><span class="up">₹247/u</span></td>
 </tr><tr>
   <td style="text-align:left">SJ</td>
@@ -1813,8 +1801,8 @@
   <td class="n">₹12,636</td>
   <td class="n">₹10,315</td>
   <td class="n">₹20,412</td>
-  <td class="n">161.5%</td>
-  <td class="n"><span class="down" style="font-weight:600">197.9%</span></td>
+  <td class="n" style="font-weight:700">161.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">197.9%</span></td>
   <td class="n"><span class="down">₹-511/u</span></td>
 </tr><tr>
   <td style="text-align:left">SJ+SFP</td>
@@ -1822,8 +1810,8 @@
   <td class="n">₹11,538</td>
   <td class="n">₹9,447</td>
   <td class="n">₹11,694</td>
-  <td class="n">101.4%</td>
-  <td class="n"><span class="down" style="font-weight:600">123.8%</span></td>
+  <td class="n" style="font-weight:700">101.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">123.8%</span></td>
   <td class="n"><span class="down">₹-384/u</span></td>
 </tr><tr>
   <td style="text-align:left">Glue</td>
@@ -1831,8 +1819,8 @@
   <td class="n">₹10,258</td>
   <td class="n">₹8,338</td>
   <td class="n">₹7,105</td>
-  <td class="n">69.3%</td>
-  <td class="n"><span class="" style="font-weight:600">85.2%</span></td>
+  <td class="n" style="font-weight:700">69.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">85.2%</span></td>
   <td class="n"><span class="down">₹-146/u</span></td>
 </tr><tr>
   <td style="text-align:left">Mini Dessert Party</td>
@@ -1840,8 +1828,8 @@
   <td class="n">₹10,012</td>
   <td class="n">₹7,461</td>
   <td class="n">₹33,957</td>
-  <td class="n">339.2%</td>
-  <td class="n"><span class="down" style="font-weight:600">455.1%</span></td>
+  <td class="n" style="font-weight:700">339.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">455.1%</span></td>
   <td class="n"><span class="down">₹-1,228/u</span></td>
 </tr><tr>
   <td style="text-align:left">A1 Kit</td>
@@ -1849,8 +1837,8 @@
   <td class="n">₹9,882</td>
   <td class="n">₹8,059</td>
   <td class="n">₹9,876</td>
-  <td class="n">99.9%</td>
-  <td class="n"><span class="down" style="font-weight:600">122.5%</span></td>
+  <td class="n" style="font-weight:700">99.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">122.5%</span></td>
   <td class="n"><span class="down">₹-326/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+B3</td>
@@ -1858,8 +1846,8 @@
   <td class="n">₹9,627</td>
   <td class="n">₹7,921</td>
   <td class="n">₹5,643</td>
-  <td class="n">58.6%</td>
-  <td class="n"><span class="" style="font-weight:600">71.2%</span></td>
+  <td class="n" style="font-weight:700">58.6%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">71.2%</span></td>
   <td class="n"><span class="down">₹-11/u</span></td>
 </tr><tr>
   <td style="text-align:left">DP+B8</td>
@@ -1867,8 +1855,8 @@
   <td class="n">₹8,471</td>
   <td class="n">₹6,974</td>
   <td class="n">₹6,310</td>
-  <td class="n">74.5%</td>
-  <td class="n"><span class="down" style="font-weight:600">90.5%</span></td>
+  <td class="n" style="font-weight:700">74.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">90.5%</span></td>
   <td class="n"><span class="down">₹-254/u</span></td>
 </tr><tr>
   <td style="text-align:left">B8+AR</td>
@@ -1876,8 +1864,8 @@
   <td class="n">₹7,803</td>
   <td class="n">₹6,348</td>
   <td class="n">₹4,455</td>
-  <td class="n">57.1%</td>
-  <td class="n"><span class="" style="font-weight:600">70.2%</span></td>
+  <td class="n" style="font-weight:700">57.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">70.2%</span></td>
   <td class="n"><span class="down">₹-262/u</span></td>
 </tr><tr>
   <td style="text-align:left">Magic Dough</td>
@@ -1885,8 +1873,8 @@
   <td class="n">₹7,739</td>
   <td class="n">₹6,267</td>
   <td class="n">₹21,685</td>
-  <td class="n">280.2%</td>
-  <td class="n"><span class="down" style="font-weight:600">346.0%</span></td>
+  <td class="n" style="font-weight:700">280.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">346.0%</span></td>
   <td class="n"><span class="down">₹-1,128/u</span></td>
 </tr><tr>
   <td style="text-align:left">Puzzle Kit</td>
@@ -1894,8 +1882,8 @@
   <td class="n">₹7,592</td>
   <td class="n">₹6,160</td>
   <td class="n">₹11,650</td>
-  <td class="n">153.4%</td>
-  <td class="n"><span class="down" style="font-weight:600">189.1%</span></td>
+  <td class="n" style="font-weight:700">153.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">189.1%</span></td>
   <td class="n"><span class="down">₹-933/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+CB</td>
@@ -1903,8 +1891,8 @@
   <td class="n">₹6,818</td>
   <td class="n">₹5,598</td>
   <td class="n">₹2,819</td>
-  <td class="n">41.4%</td>
-  <td class="n"><span class="" style="font-weight:600">50.4%</span></td>
+  <td class="n" style="font-weight:700">41.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">50.4%</span></td>
   <td class="n"><span class="up">₹106/u</span></td>
 </tr><tr>
   <td style="text-align:left">Canvas</td>
@@ -1912,8 +1900,8 @@
   <td class="n">₹6,725</td>
   <td class="n">₹5,260</td>
   <td class="n">₹6,018</td>
-  <td class="n">89.5%</td>
-  <td class="n"><span class="down" style="font-weight:600">114.4%</span></td>
+  <td class="n" style="font-weight:700">89.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">114.4%</span></td>
   <td class="n"><span class="down">₹-160/u</span></td>
 </tr><tr>
   <td style="text-align:left">DP+Playdough</td>
@@ -1921,8 +1909,8 @@
   <td class="n">₹6,598</td>
   <td class="n">₹5,370</td>
   <td class="n">₹6,015</td>
-  <td class="n">91.2%</td>
-  <td class="n"><span class="down" style="font-weight:600">112.0%</span></td>
+  <td class="n" style="font-weight:700">91.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">112.0%</span></td>
   <td class="n"><span class="down">₹-439/u</span></td>
 </tr><tr>
   <td style="text-align:left">Dino Kit</td>
@@ -1930,8 +1918,8 @@
   <td class="n">₹6,334</td>
   <td class="n">₹5,184</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹93/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP8+Canvs</td>
@@ -1939,8 +1927,8 @@
   <td class="n">₹5,951</td>
   <td class="n">₹4,914</td>
   <td class="n">₹4,724</td>
-  <td class="n">79.4%</td>
-  <td class="n"><span class="down" style="font-weight:600">96.1%</span></td>
+  <td class="n" style="font-weight:700">79.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">96.1%</span></td>
   <td class="n"><span class="down">₹-354/u</span></td>
 </tr><tr>
   <td style="text-align:left">Dino Kit</td>
@@ -1948,8 +1936,8 @@
   <td class="n">₹5,827</td>
   <td class="n">₹4,578</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹1,413/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP8+CB+Apron</td>
@@ -1957,8 +1945,8 @@
   <td class="n">₹5,714</td>
   <td class="n">₹4,711</td>
   <td class="n">₹7,745</td>
-  <td class="n">135.5%</td>
-  <td class="n"><span class="down" style="font-weight:600">164.4%</span></td>
+  <td class="n" style="font-weight:700">135.5%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">164.4%</span></td>
   <td class="n"><span class="down">₹-1,642/u</span></td>
 </tr><tr>
   <td style="text-align:left">MPD+AR+JB</td>
@@ -1966,8 +1954,8 @@
   <td class="n">₹5,628</td>
   <td class="n">₹4,648</td>
   <td class="n">₹24,706</td>
-  <td class="n">439.0%</td>
-  <td class="n"><span class="down" style="font-weight:600">531.6%</span></td>
+  <td class="n" style="font-weight:700">439.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">531.6%</span></td>
   <td class="n"><span class="down">₹-7,277/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP+CB+Canvas</td>
@@ -1975,8 +1963,8 @@
   <td class="n">₹5,625</td>
   <td class="n">₹4,647</td>
   <td class="n">₹3,324</td>
-  <td class="n">59.1%</td>
-  <td class="n"><span class="" style="font-weight:600">71.5%</span></td>
+  <td class="n" style="font-weight:700">59.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">71.5%</span></td>
   <td class="n"><span class="down">₹-237/u</span></td>
 </tr><tr>
   <td style="text-align:left">DP+SFP</td>
@@ -1984,8 +1972,8 @@
   <td class="n">₹5,493</td>
   <td class="n">₹4,539</td>
   <td class="n">₹4,260</td>
-  <td class="n">77.6%</td>
-  <td class="n"><span class="down" style="font-weight:600">93.9%</span></td>
+  <td class="n" style="font-weight:700">77.6%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">93.9%</span></td>
   <td class="n"><span class="down">₹-309/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+B8</td>
@@ -1993,8 +1981,8 @@
   <td class="n">₹5,050</td>
   <td class="n">₹4,178</td>
   <td class="n">₹2,272</td>
-  <td class="n">45.0%</td>
-  <td class="n"><span class="" style="font-weight:600">54.4%</span></td>
+  <td class="n" style="font-weight:700">45.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">54.4%</span></td>
   <td class="n"><span class="up">₹127/u</span></td>
 </tr><tr>
   <td style="text-align:left">Activity Pack</td>
@@ -2002,8 +1990,8 @@
   <td class="n">₹4,977</td>
   <td class="n">₹3,840</td>
   <td class="n">₹48,596</td>
-  <td class="n">976.4%</td>
-  <td class="n"><span class="down" style="font-weight:600">1265.4%</span></td>
+  <td class="n" style="font-weight:700">976.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">1265.4%</span></td>
   <td class="n"><span class="down">₹-889/u</span></td>
 </tr><tr>
   <td style="text-align:left">India Map Kit</td>
@@ -2011,8 +1999,8 @@
   <td class="n">₹4,925</td>
   <td class="n">₹4,053</td>
   <td class="n">₹4,227</td>
-  <td class="n">85.8%</td>
-  <td class="n"><span class="down" style="font-weight:600">104.3%</span></td>
+  <td class="n" style="font-weight:700">85.8%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">104.3%</span></td>
   <td class="n"><span class="down">₹-315/u</span></td>
 </tr><tr>
   <td style="text-align:left">Unicorn Kit</td>
@@ -2020,8 +2008,8 @@
   <td class="n">₹4,402</td>
   <td class="n">₹3,590</td>
   <td class="n">₹11,738</td>
-  <td class="n">266.7%</td>
-  <td class="n"><span class="down" style="font-weight:600">326.9%</span></td>
+  <td class="n" style="font-weight:700">266.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">326.9%</span></td>
   <td class="n"><span class="down">₹-831/u</span></td>
 </tr><tr>
   <td style="text-align:left">T&F+FP3</td>
@@ -2029,8 +2017,8 @@
   <td class="n">₹4,077</td>
   <td class="n">₹2,619</td>
   <td class="n">₹10,223</td>
-  <td class="n">250.8%</td>
-  <td class="n"><span class="down" style="font-weight:600">390.3%</span></td>
+  <td class="n" style="font-weight:700">250.8%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">390.3%</span></td>
   <td class="n"><span class="down">₹-1,659/u</span></td>
 </tr><tr>
   <td style="text-align:left">Glue+FP3+B8</td>
@@ -2038,8 +2026,8 @@
   <td class="n">₹4,014</td>
   <td class="n">₹3,332</td>
   <td class="n">₹7,590</td>
-  <td class="n">189.1%</td>
-  <td class="n"><span class="down" style="font-weight:600">227.8%</span></td>
+  <td class="n" style="font-weight:700">189.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">227.8%</span></td>
   <td class="n"><span class="down">₹-1,825/u</span></td>
 </tr><tr>
   <td style="text-align:left">CB</td>
@@ -2047,8 +2035,8 @@
   <td class="n">₹3,911</td>
   <td class="n">₹3,615</td>
   <td class="n">₹4,385</td>
-  <td class="n">112.1%</td>
-  <td class="n"><span class="down" style="font-weight:600">121.3%</span></td>
+  <td class="n" style="font-weight:700">112.1%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">121.3%</span></td>
   <td class="n"><span class="down">₹-427/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+AR</td>
@@ -2056,8 +2044,8 @@
   <td class="n">₹3,813</td>
   <td class="n">₹2,963</td>
   <td class="n">₹4,544</td>
-  <td class="n">119.2%</td>
-  <td class="n"><span class="down" style="font-weight:600">153.3%</span></td>
+  <td class="n" style="font-weight:700">119.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">153.3%</span></td>
   <td class="n"><span class="down">₹-921/u</span></td>
 </tr><tr>
   <td style="text-align:left">B8+FP3+AR</td>
@@ -2065,8 +2053,8 @@
   <td class="n">₹3,182</td>
   <td class="n">₹2,621</td>
   <td class="n">₹904</td>
-  <td class="n">28.4%</td>
-  <td class="n"><span class="" style="font-weight:600">34.5%</span></td>
+  <td class="n" style="font-weight:700">28.4%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="">34.5%</span></td>
   <td class="n"><span class="up">₹187/u</span></td>
 </tr><tr>
   <td style="text-align:left">Dino Kit</td>
@@ -2074,8 +2062,8 @@
   <td class="n">₹2,976</td>
   <td class="n">₹2,354</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹761/u</span></td>
 </tr><tr>
   <td style="text-align:left">Unicorn Kit</td>
@@ -2083,8 +2071,8 @@
   <td class="n">₹2,943</td>
   <td class="n">₹2,319</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹1,371/u</span></td>
 </tr><tr>
   <td style="text-align:left">DP+Glue</td>
@@ -2092,8 +2080,8 @@
   <td class="n">₹2,592</td>
   <td class="n">₹2,108</td>
   <td class="n">₹4,492</td>
-  <td class="n">173.3%</td>
-  <td class="n"><span class="down" style="font-weight:600">213.1%</span></td>
+  <td class="n" style="font-weight:700">173.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">213.1%</span></td>
   <td class="n"><span class="down">₹-827/u</span></td>
 </tr><tr>
   <td style="text-align:left">FF Unicorn + Dino</td>
@@ -2101,8 +2089,8 @@
   <td class="n">₹2,251</td>
   <td class="n">₹1,728</td>
   <td class="n">₹5,060</td>
-  <td class="n">224.8%</td>
-  <td class="n"><span class="down" style="font-weight:600">292.8%</span></td>
+  <td class="n" style="font-weight:700">224.8%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">292.8%</span></td>
   <td class="n"><span class="down">₹-1,475/u</span></td>
 </tr><tr>
   <td style="text-align:left">FP3+Glue+AR+B3</td>
@@ -2110,8 +2098,8 @@
   <td class="n">₹2,101</td>
   <td class="n">₹1,752</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹895/u</span></td>
 </tr><tr>
   <td style="text-align:left">Pet Paw Kit</td>
@@ -2119,8 +2107,8 @@
   <td class="n">₹2,074</td>
   <td class="n">₹1,711</td>
   <td class="n">₹1,704</td>
-  <td class="n">82.2%</td>
-  <td class="n"><span class="down" style="font-weight:600">99.6%</span></td>
+  <td class="n" style="font-weight:700">82.2%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">99.6%</span></td>
   <td class="n"><span class="down">₹-161/u</span></td>
 </tr><tr>
   <td style="text-align:left">A1 Kit+B8</td>
@@ -2128,8 +2116,8 @@
   <td class="n">₹1,836</td>
   <td class="n">₹1,503</td>
   <td class="n">₹4,595</td>
-  <td class="n">250.3%</td>
-  <td class="n"><span class="down" style="font-weight:600">305.8%</span></td>
+  <td class="n" style="font-weight:700">250.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">305.8%</span></td>
   <td class="n"><span class="down">₹-1,840/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP+AR+Apron</td>
@@ -2137,8 +2125,8 @@
   <td class="n">₹1,636</td>
   <td class="n">₹1,686</td>
   <td class="n">₹2,246</td>
-  <td class="n">137.3%</td>
-  <td class="n"><span class="down" style="font-weight:600">133.2%</span></td>
+  <td class="n" style="font-weight:700">137.3%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">133.2%</span></td>
   <td class="n"><span class="down">₹-1,249/u</span></td>
 </tr><tr>
   <td style="text-align:left">SFP+CB+Apron</td>
@@ -2146,8 +2134,8 @@
   <td class="n">₹1,596</td>
   <td class="n">₹1,308</td>
   <td class="n">₹1,755</td>
-  <td class="n">110.0%</td>
-  <td class="n"><span class="down" style="font-weight:600">134.2%</span></td>
+  <td class="n" style="font-weight:700">110.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">134.2%</span></td>
   <td class="n"><span class="down">₹-1,232/u</span></td>
 </tr><tr>
   <td style="text-align:left">Activity Pack</td>
@@ -2155,8 +2143,8 @@
   <td class="n">₹946</td>
   <td class="n">₹727</td>
   <td class="n">₹6,325</td>
-  <td class="n">668.6%</td>
-  <td class="n"><span class="down" style="font-weight:600">869.5%</span></td>
+  <td class="n" style="font-weight:700">668.6%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">869.5%</span></td>
   <td class="n"><span class="down">₹-588/u</span></td>
 </tr><tr>
   <td style="text-align:left">Unicorn+B8</td>
@@ -2164,8 +2152,8 @@
   <td class="n">₹863</td>
   <td class="n">₹704</td>
   <td class="n">₹1,136</td>
-  <td class="n">131.7%</td>
-  <td class="n"><span class="down" style="font-weight:600">161.4%</span></td>
+  <td class="n" style="font-weight:700">131.7%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">161.4%</span></td>
   <td class="n"><span class="down">₹-618/u</span></td>
 </tr><tr>
   <td style="text-align:left">FF Dino/FF Unicorn</td>
@@ -2173,8 +2161,8 @@
   <td class="n">₹760</td>
   <td class="n">₹579</td>
   <td class="n">₹0</td>
-  <td class="n">0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">0.0%</span></td>
+  <td class="n" style="font-weight:700">0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">0.0%</span></td>
   <td class="n"><span class="up">₹98/u</span></td>
 </tr><tr>
   <td style="text-align:left">P&B</td>
@@ -2182,8 +2170,8 @@
   <td class="n">₹251</td>
   <td class="n">₹198</td>
   <td class="n">₹671</td>
-  <td class="n">267.9%</td>
-  <td class="n"><span class="down" style="font-weight:600">338.7%</span></td>
+  <td class="n" style="font-weight:700">267.9%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="down">338.7%</span></td>
   <td class="n"><span class="down">₹-564/u</span></td>
 </tr><tr>
   <td style="text-align:left">Unicorn Kit</td>
@@ -2191,8 +2179,8 @@
   <td class="n">₹-76</td>
   <td class="n">₹-387</td>
   <td class="n">₹0</td>
-  <td class="n">-0.0%</td>
-  <td class="n"><span class="up" style="font-weight:600">-0.0%</span></td>
+  <td class="n" style="font-weight:700">-0.0%</td>
+  <td class="n" style="color:var(--ink-3)"><span class="up">-0.0%</span></td>
   <td class="n"><span class="down">₹-804/u</span></td>
 </tr>
     <tr style="font-weight:700;background:var(--wash)">
@@ -2201,8 +2189,8 @@
       <td class="n">₹2,420,328</td>
       <td class="n">₹1,993,065</td>
       <td class="n">₹1,803,521</td>
-      <td class="n" style="color:var(--warn)">74.5%</td>
-      <td class="n" style="color:var(--crit)">90.5%</td>
+      <td class="n" style="color:var(--good);font-weight:800">74.5% ✓</td>
+      <td class="n" style="color:var(--ink-3)">90.5%</td>
       <td class="n">₹-217/u</td>
     </tr>
   </tbody>
