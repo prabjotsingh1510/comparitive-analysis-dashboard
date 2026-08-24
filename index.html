@@ -420,13 +420,13 @@
   // All verified — each row sums to 100%
   var channels = ['Website','Amazon','FirstCry','Blinkit'];
   var data = [
-    [20.9, 90.5,  0.0, 17.0,  43.0, -71.4],  // Website  (sum=100)
+    [17.2, 74.5,  0.0, 18.6,  30.2, -40.5],  // Website  (sum=100, % of gross rev w/ GST)
     [22.3, 28.7,  0.0, 17.1,  29.7,   2.2],  // Amazon   (sum=100)
     [18.4,  0.0, 47.0,  0.0,  35.8,  -1.2],  // FirstCry (sum=100)
     [22.3, 50.7,  0.0, 11.4, 106.6, -91.0],  // Blinkit  (sum=100)
   ];
-  var netRevs = ['₹19.9 L','₹58.1 L','₹7.2 L','₹7.1 L'];
-  var ebitdaLabels = ['-71.4%','+2.2%','-1.2%','-91.0%'];
+  var netRevs = ['₹24.2 L','₹58.1 L','₹7.2 L','₹7.1 L'];
+  var ebitdaLabels = ['-40.5%','+2.2%','-1.2%','-91.0%'];
 
   function isDark() {
     return document.documentElement.getAttribute('data-theme')==='dark' ||
@@ -2950,9 +2950,9 @@ function renderS4(){
 
   const tks=[
     ['var(--warn)','Marketing spend still dwarfs contribution in Jan–Mar — though it eased sharply by Apr–Jun.',
-     `Blended marketing was <b>${R(mkJ)}/unit</b> in Jan–Mar — <b>${(J.mktg/J.netrev*100).toFixed(1)}%</b> of net revenue,
-      more than the entire net revenue line — easing to <b>${R(mkA)}/unit</b> (<b>${(A.mktg/A.netrev*100).toFixed(1)}%</b>) by
-      Apr–Jun. Gross margin held a healthy <b>${(J.gm/J.netrev*100).toFixed(1)}%</b> throughout — the products are fine.
+     `Blended marketing was <b>${R(mkJ)}/unit</b> in Jan–Mar — <b>${(J.mktg/J.tot.rev*100).toFixed(1)}%</b> of gross revenue,
+      more than the entire gross revenue line — easing to <b>${R(mkA)}/unit</b> (<b>${(A.mktg/A.tot.rev*100).toFixed(1)}%</b>) by
+      Apr–Jun. Gross margin held a healthy <b>${(J.gm/J.tot.rev*100).toFixed(1)}%</b> throughout — the products are fine.
       Acquisition cost is still the single biggest line item on the P&amp;L; it just stopped being catastrophic.`],
 
     ['var(--good)','Apr–Jun per-unit economics genuinely improved — the revenue dip is a data correction, not demand.',
@@ -3213,7 +3213,7 @@ function renderS5(){
       <h4>${D.periods[pk].label} — profitable until marketing</h4>
       <p>After <em>all</em> product, packaging, payment, shipping and COD costs, the business still holds
         <b>${Rs(w.cm1)}</b> of CM1 — <b>${(w.cm1/w.gross*100).toFixed(1)}%</b> of gross revenue.
-        Marketing then removes <b>${Rs(-w.mkt)}</b> (<b>${w.mkt_pct_nr.toFixed(1)}%</b> of net revenue), taking CM2 to
+        Marketing then removes <b>${Rs(-w.mkt)}</b> (<b>${w.mkt_pct_gross.toFixed(1)}%</b> of gross revenue), taking CM2 to
         <b>${Rs(w.cm2)}</b>. Overheads of ${Rs(-w.oh)} take EBITDA to <b>${Rs(w.eb)}</b>.
         <b>Marketing is ${(Math.abs(w.mkt)/Math.abs(w.com+w.pack+w.rzp+w.ship+w.cod)).toFixed(1)}×</b>
         every other cost line combined.</p></div>`;}).join('')}
